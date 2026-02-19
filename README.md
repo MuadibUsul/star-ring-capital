@@ -188,6 +188,35 @@ git commit -m "feat: xxx"
 git push origin main
 ```
 
+### 6.5 `ssh: handshake failed: EOF` 一键替代方案（推荐大陆网络）
+
+如果 GitHub Actions 的 `Deploy via SSH` 偶发失败（常见于安全组/网络链路），可改为服务器主动拉取，不再依赖 GitHub 入站 SSH：
+
+1. 服务器执行一次安装（root）：
+
+```bash
+cd /opt/star-ring-capital
+bash scripts/install-auto-pull.sh
+```
+
+2. 查看定时器状态：
+
+```bash
+systemctl status src-auto-pull-deploy.timer --no-pager
+```
+
+3. 查看最近执行日志：
+
+```bash
+journalctl -u src-auto-pull-deploy.service -n 100 --no-pager
+```
+
+说明：
+
+- 定时器默认每 `2` 分钟检查一次 `origin/main`。
+- 有新提交就自动执行 `bash scripts/server-deploy.sh`。
+- 如需改频率：`INTERVAL_MINUTES=1 bash scripts/install-auto-pull.sh`。
+
 ## 7. 合规约束
 
 - 不提供投资建议功能
