@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Button } from '@/components/ui/button'
+import { localizeNavLabel, type SiteLocale } from '@/lib/i18n'
 
 type NavItem = {
   id: string | number
@@ -11,6 +13,7 @@ type NavItem = {
 }
 
 type SiteHeaderProps = {
+  locale: SiteLocale
   siteName: string
   tagline: string
   navItems: NavItem[]
@@ -26,6 +29,7 @@ const normalizePath = (slug?: string | null) => {
 }
 
 export async function SiteHeader({
+  locale,
   siteName,
   tagline,
   navItems,
@@ -58,14 +62,21 @@ export async function SiteHeader({
               href={normalizePath(item.slug)}
               key={String(item.id)}
             >
-              {item.navigation?.navLabel || item.slug}
+              {localizeNavLabel({
+                locale,
+                slug: item.slug,
+                label: item.navigation?.navLabel,
+              })}
             </Link>
           ))}
         </nav>
 
-        <Button asChild className="hidden lg:inline-flex" size="default" variant="ghost">
-          <Link href={ctaUrl || '/contact'}>{ctaLabel || 'Strategic Collaboration'}</Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher locale={locale} />
+          <Button asChild className="hidden lg:inline-flex" size="default" variant="ghost">
+            <Link href={ctaUrl || '/contact'}>{ctaLabel || 'Strategic Collaboration'}</Link>
+          </Button>
+        </div>
       </div>
     </header>
   )

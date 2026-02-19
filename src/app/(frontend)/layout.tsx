@@ -6,6 +6,7 @@ import type React from 'react'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import { getServerSideURL } from '@/lib/getURL'
+import { getRequestLocale, localizeField } from '@/lib/i18n'
 import { queryNavigation, querySiteSettings, queryThemeSettings } from '@/lib/queries'
 
 import './globals.css'
@@ -30,6 +31,7 @@ export const fetchCache = 'force-no-store'
 
 export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled: draft } = await draftMode()
+  const locale = await getRequestLocale()
 
   const [siteSettings, themeSettings, navItems] = await Promise.all([
     querySiteSettings({ draft }),
@@ -61,31 +63,59 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   } as React.CSSProperties
 
   const logo = themeSettings?.logo && typeof themeSettings.logo === 'object' ? themeSettings.logo : null
+  const localizedSiteName = localizeField({
+    locale,
+    value: siteSettings?.siteName,
+    fallback: {
+      en: 'Star Ring Capital',
+      zh: '星环资本',
+    },
+  })
+  const localizedTagline = localizeField({
+    locale,
+    value: siteSettings?.tagline,
+    fallback: {
+      en: 'Private Capital Structure Office',
+      zh: '私域资本结构办公室',
+    },
+  })
+  const localizedCTA = localizeField({
+    locale,
+    value: siteSettings?.primaryNavCTA?.label,
+    fallback: {
+      en: 'Strategic Collaboration',
+      zh: '战略协作',
+    },
+  })
+  const localizedFooterNote = localizeField({
+    locale,
+    value: siteSettings?.footerNote,
+    fallback: {
+      en: 'Structured influence. Stable growth. Disciplined risk architecture.',
+      zh: '结构化影响力，稳健增长，纪律化风险架构。',
+    },
+  })
 
   return (
     <html
       className={`${manrope.variable} ${cormorant.variable} ${spaceGrotesk.variable}`}
       data-button-variant={themeSettings?.buttonStyle?.variant || 'outline'}
-      lang="en"
+      lang={locale === 'zh' ? 'zh-CN' : 'en'}
       style={vars}
     >
       <body>
         <SiteHeader
-          ctaLabel={siteSettings?.primaryNavCTA?.label}
+          ctaLabel={localizedCTA}
           ctaUrl={siteSettings?.primaryNavCTA?.url}
+          locale={locale}
           logoAlt={logo?.alt}
           logoUrl={logo?.url}
           navItems={navItems}
-          siteName={siteSettings?.siteName || 'Star Ring Capital'}
-          tagline={siteSettings?.tagline || 'Private Capital Structure Office'}
+          siteName={localizedSiteName}
+          tagline={localizedTagline}
         />
         <main className="relative flex-1">{children}</main>
-        <SiteFooter
-          footerNote={
-            siteSettings?.footerNote ||
-            'Structured influence. Stable growth. Disciplined risk architecture.'
-          }
-        />
+        <SiteFooter footerNote={localizedFooterNote} siteName={localizedSiteName} />
       </body>
     </html>
   )

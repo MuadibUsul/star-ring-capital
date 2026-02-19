@@ -18,9 +18,11 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/cn'
+import { t, type SiteLocale } from '@/lib/i18n'
 
 type PageRendererProps = {
   page: any
+  locale: SiteLocale
 }
 
 type TrajectoryPeriod = {
@@ -67,7 +69,7 @@ function OrbitLayer() {
   )
 }
 
-function TrajectoryChart({ block }: { block: any }) {
+function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) {
   const trajectoryDoc = asDoc<{
     periods?: TrajectoryPeriod[]
     complianceStatements?: { statement?: string }[]
@@ -136,9 +138,28 @@ function TrajectoryChart({ block }: { block: any }) {
                   color: 'var(--src-text)',
                 }}
               />
-              <Line dataKey="starRingCapital" name="Star Ring Capital" stroke="var(--src-accent)" strokeWidth={2.6} type="monotone" />
-              <Line dataKey="globalEquityBenchmark" name="Global Equity Benchmark" stroke="#8b94aa" strokeWidth={2} type="monotone" />
-              <Line dataKey="riskFreeBenchmark" name="Risk-free Benchmark" stroke="#5e6578" strokeDasharray="5 4" strokeWidth={1.8} type="monotone" />
+              <Line
+                dataKey="starRingCapital"
+                name={t(locale, { en: 'Star Ring Capital', zh: '星环资本' })}
+                stroke="var(--src-accent)"
+                strokeWidth={2.6}
+                type="monotone"
+              />
+              <Line
+                dataKey="globalEquityBenchmark"
+                name={t(locale, { en: 'Global Equity Benchmark', zh: '全球权益基准' })}
+                stroke="#8b94aa"
+                strokeWidth={2}
+                type="monotone"
+              />
+              <Line
+                dataKey="riskFreeBenchmark"
+                name={t(locale, { en: 'Risk-free Benchmark', zh: '无风险基准' })}
+                stroke="#5e6578"
+                strokeDasharray="5 4"
+                strokeWidth={1.8}
+                type="monotone"
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -146,19 +167,27 @@ function TrajectoryChart({ block }: { block: any }) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">3Y CAGR</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
+            {t(locale, { en: '3Y CAGR', zh: '3年复合增长率' })}
+          </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.cagr)}</p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">Max Drawdown</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
+            {t(locale, { en: 'Max Drawdown', zh: '最大回撤' })}
+          </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.maxDrawdown)}</p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">Volatility</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
+            {t(locale, { en: 'Volatility', zh: '波动率' })}
+          </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.volatility)}</p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">Sharpe Ratio</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
+            {t(locale, { en: 'Sharpe Ratio', zh: '夏普比率' })}
+          </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{active.metrics.sharpeRatio.toFixed(2)}</p>
         </Card>
       </div>
@@ -174,7 +203,7 @@ function TrajectoryChart({ block }: { block: any }) {
   )
 }
 
-function ContactForm({ block }: { block: any }) {
+function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
@@ -182,7 +211,14 @@ function ContactForm({ block }: { block: any }) {
       .map(([key, value]) => `${key}: ${String(value)}`)
       .join('%0A')
 
-    window.location.href = `mailto:${block.email}?subject=Strategic%20Alignment%20Inquiry&body=${summary}`
+    const subject = encodeURIComponent(
+      t(locale, {
+        en: 'Strategic Alignment Inquiry',
+        zh: '战略协同咨询',
+      }),
+    )
+
+    window.location.href = `mailto:${block.email}?subject=${subject}&body=${summary}`
   }
 
   return (
@@ -225,7 +261,12 @@ function ContactForm({ block }: { block: any }) {
               )
             })}
 
-            <Button type="submit">Submit Alignment Request</Button>
+            <Button type="submit">
+              {t(locale, {
+                en: 'Submit Alignment Request',
+                zh: '提交协同申请',
+              })}
+            </Button>
           </form>
         </Card>
       ) : null}
@@ -233,7 +274,7 @@ function ContactForm({ block }: { block: any }) {
   )
 }
 
-export function PageDocumentRenderer({ page }: PageRendererProps) {
+export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
   const blocks = Array.isArray(page?.layout) ? page.layout : []
 
   return (
@@ -246,15 +287,32 @@ export function PageDocumentRenderer({ page }: PageRendererProps) {
             <section className="relative overflow-hidden rounded-3xl border border-[color-mix(in_srgb,var(--src-accent)_25%,transparent)] px-8 py-20 lg:px-14" key={key}>
               <OrbitLayer />
               <div className="relative z-10 max-w-3xl space-y-6">
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--src-accent)]">Private Capital Structure Office</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--src-accent)]">
+                  {t(locale, {
+                    en: 'Private Capital Structure Office',
+                    zh: '私域资本结构办公室',
+                  })}
+                </p>
                 <h1 className="font-heading text-5xl leading-tight text-[var(--src-text)] lg:text-7xl">{block.brandName}</h1>
                 <p className="max-w-2xl text-sm leading-7 text-[var(--src-muted)]">{block.positioning}</p>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild>
-                    <Link href={block.primaryCTA?.url || '/philosophy'}>{block.primaryCTA?.label || 'Explore Philosophy'}</Link>
+                    <Link href={block.primaryCTA?.url || '/philosophy'}>
+                      {block.primaryCTA?.label ||
+                        t(locale, {
+                          en: 'Explore Philosophy',
+                          zh: '探索理念',
+                        })}
+                    </Link>
                   </Button>
                   <Button asChild variant="ghost">
-                    <Link href={block.secondaryCTA?.url || '/contact'}>{block.secondaryCTA?.label || 'Strategic Collaboration'}</Link>
+                    <Link href={block.secondaryCTA?.url || '/contact'}>
+                      {block.secondaryCTA?.label ||
+                        t(locale, {
+                          en: 'Strategic Collaboration',
+                          zh: '战略协作',
+                        })}
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -326,7 +384,7 @@ export function PageDocumentRenderer({ page }: PageRendererProps) {
         }
 
         if (block.blockType === 'trajectoryViewer') {
-          return <TrajectoryChart block={block} key={key} />
+          return <TrajectoryChart block={block} key={key} locale={locale} />
         }
 
         if (block.blockType === 'riskArchitecture') {
@@ -336,7 +394,9 @@ export function PageDocumentRenderer({ page }: PageRendererProps) {
               <div className="grid gap-4 lg:grid-cols-2">
                 {asDocArray<any>(block.layers).map((layer, layerIndex) => (
                   <Card key={`${layer.layerName}-${layerIndex}`}>
-                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--src-accent)]">Layer {layerIndex + 1}</p>
+                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--src-accent)]">
+                      {t(locale, { en: 'Layer', zh: '层级' })} {layerIndex + 1}
+                    </p>
                     <p className="mt-2 font-heading text-xl text-[var(--src-text)]">{layer.layerName}</p>
                     <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{layer.purpose}</p>
                     <ul className="mt-4 space-y-2 text-sm text-[var(--src-muted)]">
@@ -389,7 +449,9 @@ export function PageDocumentRenderer({ page }: PageRendererProps) {
                 {portrait?.url ? (
                   <img alt={portrait.alt || block.heading} className="h-full min-h-[360px] w-full object-cover" src={portrait.url} />
                 ) : (
-                  <div className="grid min-h-[360px] place-items-center text-sm text-[var(--src-muted)]">Founder Portrait</div>
+                  <div className="grid min-h-[360px] place-items-center text-sm text-[var(--src-muted)]">
+                    {t(locale, { en: 'Founder Portrait', zh: '创始人肖像' })}
+                  </div>
                 )}
               </Card>
 
@@ -409,7 +471,7 @@ export function PageDocumentRenderer({ page }: PageRendererProps) {
         }
 
         if (block.blockType === 'contactModule') {
-          return <ContactForm block={block} key={key} />
+          return <ContactForm block={block} key={key} locale={locale} />
         }
 
         return null

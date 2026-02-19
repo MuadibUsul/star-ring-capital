@@ -8,6 +8,7 @@
 - 前台：黑金极简风、可扩展机构化信息架构
 - 后台：Payload Admin 登录鉴权、Blocks 拖拽编辑、Live Preview 实时预览
 - 主题系统：`Theme Settings (Global)` 可直接改配色/字体/按钮/Logo/环形光轨参数
+- 语言切换：前台 Header 支持 `EN / 中文` 一键切换（基于 Cookie 持久化）
 - 数据模型：
   - `Pages`（含 slug、SEO、Blocks）
   - `TrajectoryData`（3Y/1Y/YTD 曲线 + 指标 + 合规提示）
@@ -28,6 +29,11 @@
 - Contact (`/contact`)
 
 可在后台调整导航顺序与显隐（`Pages.navigation.navOrder / showInNav`）。
+
+中英双语内容录入约定（无需改 schema）：
+
+- 在文本字段中按 `中文 || English` 格式输入时，前台会按当前语言自动拆分展示。
+- 未按该格式录入时，前台仍展示原字段内容；部分导航与系统文案有内置中文兜底翻译。
 
 ## 3. 本地一键启动（Docker Compose）
 

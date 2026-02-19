@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { PageDocumentRenderer } from '@/components/page/PageDocumentRenderer'
 import { PageLivePreview } from '@/components/page/PageLivePreview'
+import { getRequestLocale } from '@/lib/i18n'
 import { queryPageBySlug, querySiteSettings } from '@/lib/queries'
 
 export const dynamic = 'force-dynamic'
@@ -21,6 +22,7 @@ const normalizeSlug = (raw?: string) => {
 
 export default async function PageRoute({ params }: PageProps) {
   const { isEnabled: draft } = await draftMode()
+  const locale = await getRequestLocale()
   const { slug: maybeSlug } = await params
   const slug = normalizeSlug(maybeSlug)
 
@@ -31,10 +33,10 @@ export default async function PageRoute({ params }: PageProps) {
   }
 
   if (draft) {
-    return <PageLivePreview initialData={page} />
+    return <PageLivePreview initialData={page} locale={locale} />
   }
 
-  return <PageDocumentRenderer page={page} />
+  return <PageDocumentRenderer locale={locale} page={page} />
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
