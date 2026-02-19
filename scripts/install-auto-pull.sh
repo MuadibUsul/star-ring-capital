@@ -4,7 +4,8 @@ set -euo pipefail
 PROJECT_DIR="${PROJECT_DIR:-/opt/star-ring-capital}"
 BRANCH="${BRANCH:-main}"
 INTERVAL_MINUTES="${INTERVAL_MINUTES:-2}"
-ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-1}"
+# Default: deploy only when git has new commits.
+ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-0}"
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "[install-auto-pull] please run as root"

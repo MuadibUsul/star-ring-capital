@@ -3,7 +3,8 @@ set -euo pipefail
 
 PROJECT_DIR="${PROJECT_DIR:-/opt/star-ring-capital}"
 BRANCH="${BRANCH:-main}"
-ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-1}"
+# Default: deploy only when git has new commits.
+ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-0}"
 
 if ! command -v git >/dev/null 2>&1; then
   echo "[auto-pull] git is required"

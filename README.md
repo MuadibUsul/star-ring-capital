@@ -92,12 +92,12 @@ npm run start
 
 目标链路：
 
-`本地改代码 -> push 到 GitHub(main) -> GitHub Actions 构建并发布 GHCR 镜像 -> 服务器定时拉取代码并执行 pull + up`
+`本地改代码 -> push 到 GitHub(main) -> GitHub Actions 构建并发布 GHCR 镜像 -> 服务器定时拉取代码并执行 web 滚动更新`
 
 仓库内置：
 
 - 工作流：`.github/workflows/deploy.yml`（仅构建与发布镜像）
-- 服务器脚本：`scripts/server-deploy.sh`（仅 pull + up，不在服务器 build）
+- 服务器脚本：`scripts/server-deploy.sh`（Compose v2-only，默认只滚动更新 `web`，失败自动回滚）
 - 定时拉取脚本：`scripts/install-auto-pull.sh`、`scripts/auto-pull-deploy.sh`
 - 生产编排：`docker-compose.prod.yml`
 
@@ -112,7 +112,21 @@ npm run start
 
 ### 6.2 服务器一次性准备
 
-1. 安装 `git`、`docker`、`docker-compose`（或 docker compose plugin）。
+1. 安装 `git`、`docker`、`docker compose`（Compose v2，必须）。  
+   Ubuntu 22.04（Docker 官方源）：
+
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+docker compose version
+```
 2. 克隆仓库到 `/opt/star-ring-capital`（服务器需要 deploy key 读取 GitHub）。
 3. 准备 `/opt/star-ring-capital/.env`：
 
@@ -140,12 +154,14 @@ cd /opt/star-ring-capital
 bash scripts/install-auto-pull.sh
 ```
 
+说明：默认 `ALWAYS_PULL_IMAGE=0`，即“只有 git 有新提交才部署”。
+
 ### 6.3 首次部署
 
 ```bash
 cd /opt/star-ring-capital
 bash scripts/server-deploy.sh
-docker-compose -f docker-compose.prod.yml run --rm web npm run seed
+docker compose -f docker-compose.prod.yml run --rm web npm run seed
 ```
 
 ### 6.4 后续迭代
@@ -159,8 +175,10 @@ git push origin main
 说明：
 
 - GitHub 会构建并推送新镜像到 GHCR。
-- 服务器每 2 分钟检查一次主分支，并执行一次 `pull + up`（确保镜像发布稍晚时也能自动追上）。
+- 服务器每 2 分钟检查一次主分支；仅有新提交时才执行部署（默认行为）。
+- 部署仅滚动更新 `web`，不会每次重建 `postgres`。
 - 如需改频率：`INTERVAL_MINUTES=1 bash scripts/install-auto-pull.sh`。
+- 如需无 git 变化也强制部署：`ALWAYS_PULL_IMAGE=1 bash scripts/install-auto-pull.sh`。
 
 ## 7. 合规约束
 
