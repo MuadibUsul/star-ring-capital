@@ -84,14 +84,27 @@ jobs:
       contents: read
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Detect SSH deploy configuration
+        id: ssh-check
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          if [ -n "$SSH_HOST" ] && [ -n "$SSH_USER" ] && [ -n "$SSH_PRIVATE_KEY" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Trigger immediate deploy on server
-        if: ${{ secrets.SSH_HOST != '' && secrets.SSH_USER != '' && secrets.SSH_PRIVATE_KEY != '' }}
+        if: ${{ steps.ssh-check.outputs.configured == 'true' }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT != '' && secrets.SSH_PORT || '22' }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           script_stop: true
           command_timeout: 25m
           script: |
@@ -102,7 +115,7 @@ jobs:
             bash scripts/server-deploy.sh
 
       - name: Fallback to timer-only mode
-        if: ${{ secrets.SSH_HOST == '' || secrets.SSH_USER == '' || secrets.SSH_PRIVATE_KEY == '' }}
+        if: ${{ steps.ssh-check.outputs.configured != 'true' }}
         run: |
           echo "SSH secrets are not configured."
           echo "Server deploy will rely on src-auto-pull-deploy.timer."
