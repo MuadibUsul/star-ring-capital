@@ -159,7 +159,7 @@ git push origin main
 说明：
 
 - GitHub 会构建并推送新镜像到 GHCR。
-- 服务器每 2 分钟检查一次主分支，有新提交就自动 `pull + up`。
+- 服务器每 2 分钟检查一次主分支，并执行一次 `pull + up`（确保镜像发布稍晚时也能自动追上）。
 - 如需改频率：`INTERVAL_MINUTES=1 bash scripts/install-auto-pull.sh`。
 
 ## 7. 合规约束

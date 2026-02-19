@@ -4,6 +4,7 @@ set -euo pipefail
 PROJECT_DIR="${PROJECT_DIR:-/opt/star-ring-capital}"
 BRANCH="${BRANCH:-main}"
 INTERVAL_MINUTES="${INTERVAL_MINUTES:-2}"
+ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-1}"
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "[install-auto-pull] please run as root"
@@ -26,6 +27,7 @@ Type=oneshot
 WorkingDirectory=$PROJECT_DIR
 Environment=PROJECT_DIR=$PROJECT_DIR
 Environment=BRANCH=$BRANCH
+Environment=ALWAYS_PULL_IMAGE=$ALWAYS_PULL_IMAGE
 ExecStart=/usr/bin/env bash $PROJECT_DIR/scripts/auto-pull-deploy.sh
 EOF
 

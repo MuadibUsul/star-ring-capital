@@ -3,6 +3,7 @@ set -euo pipefail
 
 PROJECT_DIR="${PROJECT_DIR:-/opt/star-ring-capital}"
 BRANCH="${BRANCH:-main}"
+ALWAYS_PULL_IMAGE="${ALWAYS_PULL_IMAGE:-1}"
 
 if ! command -v git >/dev/null 2>&1; then
   echo "[auto-pull] git is required"
@@ -28,13 +29,16 @@ LOCAL_SHA="$(git rev-parse HEAD)"
 REMOTE_SHA="$(git rev-parse "origin/$BRANCH")"
 
 if [[ "$LOCAL_SHA" == "$REMOTE_SHA" ]]; then
-  echo "[auto-pull] No updates, skip."
-  exit 0
+  echo "[auto-pull] No git updates."
+  if [[ "$ALWAYS_PULL_IMAGE" != "1" ]]; then
+    echo "[auto-pull] Skip deploy."
+    exit 0
+  fi
+else
+  echo "[auto-pull] Updating $LOCAL_SHA -> $REMOTE_SHA"
+  git checkout "$BRANCH"
+  git reset --hard "origin/$BRANCH"
 fi
-
-echo "[auto-pull] Updating $LOCAL_SHA -> $REMOTE_SHA"
-git checkout "$BRANCH"
-git reset --hard "origin/$BRANCH"
 
 echo "[auto-pull] Running deployment script"
 bash scripts/server-deploy.sh
