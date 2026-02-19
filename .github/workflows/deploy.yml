@@ -1,0 +1,77 @@
+name: Deploy To Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/star_ring_capital
+      PAYLOAD_SECRET: ci-secret
+      PREVIEW_SECRET: ci-preview-secret
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      SERVER_URL: http://localhost:3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-check
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          APP_DIR: ${{ secrets.APP_DIR }}
+          BRANCH: ${{ github.ref_name }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT != '' && secrets.SSH_PORT || '22' }}
+          envs: APP_DIR,BRANCH
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            APP_DIR="${APP_DIR:-/opt/star-ring-capital}"
+            BRANCH="${BRANCH:-main}"
+            REPO_SSH_URL="git@github.com:${{ github.repository }}.git"
+
+            if ! command -v git >/dev/null 2>&1; then
+              echo "git is required on server"
+              exit 1
+            fi
+
+            mkdir -p "$APP_DIR"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone --depth 1 --branch "$BRANCH" "$REPO_SSH_URL" "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+            git fetch origin "$BRANCH"
+            git checkout "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+
+            bash scripts/server-deploy.sh

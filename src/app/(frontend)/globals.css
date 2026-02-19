@@ -1,0 +1,91 @@
+@import 'tailwindcss';
+
+@config '../../../tailwind.config.mjs';
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  border-color: color-mix(in srgb, var(--src-accent) 20%, transparent);
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--src-accent) 18%, transparent), transparent 45%),
+    radial-gradient(circle at 20% 85%, color-mix(in srgb, var(--src-accent) 10%, transparent), transparent 50%),
+    linear-gradient(180deg, var(--src-bg) 0%, var(--src-bg-accent) 100%);
+  color: var(--src-text);
+  font-family: var(--src-font-body), sans-serif;
+  font-weight: var(--src-font-body-weight);
+  letter-spacing: 0.01em;
+}
+
+.font-heading {
+  font-family: var(--src-font-heading), serif;
+  font-weight: var(--src-font-heading-weight);
+  letter-spacing: 0.03em;
+}
+
+.orbit-ring {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--src-accent) 34%, transparent);
+  border-radius: 999px;
+  opacity: var(--src-orbit-opacity);
+  animation: src-orbit var(--src-orbit-speed) linear infinite;
+}
+
+.orbit-ring-1 {
+  width: 66%;
+  aspect-ratio: 1;
+  top: -10%;
+  right: -10%;
+}
+
+.orbit-ring-2 {
+  width: 42%;
+  aspect-ratio: 1;
+  top: 18%;
+  right: 18%;
+  animation-direction: reverse;
+  animation-duration: calc(var(--src-orbit-speed) * 0.7);
+}
+
+.orbit-glow {
+  position: absolute;
+  width: 28rem;
+  height: 28rem;
+  top: -30%;
+  right: -14%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--src-accent) 30%, transparent) 0%, transparent 70%);
+  filter: blur(6px);
+  opacity: var(--src-orbit-opacity);
+}
+
+[data-button-variant='rounded'] button,
+[data-button-variant='rounded'] a[data-slot='button'] {
+  border-radius: 14px !important;
+}
+
+[data-button-variant='outline'] button,
+[data-button-variant='outline'] a[data-slot='button'] {
+  background: transparent !important;
+}
+
+[data-button-variant='glow'] button,
+[data-button-variant='glow'] a[data-slot='button'] {
+  box-shadow: 0 0 calc(38px * var(--src-button-glow)) color-mix(in srgb, var(--src-accent) 55%, transparent) !important;
+}
+
+@keyframes src-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
