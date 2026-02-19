@@ -14,15 +14,19 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! docker compose version >/dev/null 2>&1; then
-  echo "[deploy] docker compose plugin is required"
+if docker compose version >/dev/null 2>&1; then
+  COMPOSE_CMD="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+  COMPOSE_CMD="docker-compose"
+else
+  echo "[deploy] docker compose is required (docker compose plugin or docker-compose)"
   exit 1
 fi
 
 echo "[deploy] Starting deployment in $PROJECT_DIR"
-docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+$COMPOSE_CMD -f docker-compose.prod.yml up -d --build --remove-orphans
 
 echo "[deploy] Services status"
-docker compose -f docker-compose.prod.yml ps
+$COMPOSE_CMD -f docker-compose.prod.yml ps
 
 echo "[deploy] Done"
