@@ -49,6 +49,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT != '' && secrets.SSH_PORT || '22' }}
+          timeout: 60s
+          command_timeout: 120m
           envs: APP_DIR,BRANCH
           script_stop: true
           script: |
