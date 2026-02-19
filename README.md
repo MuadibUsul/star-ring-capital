@@ -88,54 +88,33 @@ npm run payload:migrate
 npm run start
 ```
 
-## 6. GitHub Push 自动部署（已内置）
+## 6. GitHub Push 自动部署（推荐链路）
 
 目标链路：
 
-`本地改代码 -> push 到 GitHub(main) -> GitHub Actions SSH 到服务器 -> 服务器 git 同步 + docker compose 重启 -> 前后端自动更新`
+`本地改代码 -> push 到 GitHub(main) -> GitHub Actions 构建并发布 GHCR 镜像 -> 服务器定时拉取代码并执行 pull + up`
 
 仓库内置：
 
-- 工作流：`.github/workflows/deploy.yml`
-- 服务器脚本：`scripts/server-deploy.sh`
+- 工作流：`.github/workflows/deploy.yml`（仅构建与发布镜像）
+- 服务器脚本：`scripts/server-deploy.sh`（仅 pull + up，不在服务器 build）
+- 定时拉取脚本：`scripts/install-auto-pull.sh`、`scripts/auto-pull-deploy.sh`
 - 生产编排：`docker-compose.prod.yml`
 
-### 6.1 服务器一次性准备
+### 6.1 GitHub Actions 需要的权限
 
-1. 安装 `git`、`docker`、`docker compose plugin`
-2. 创建目录：
+- 不再需要 `SSH_HOST` / `SSH_USER` / `SSH_PRIVATE_KEY`
+- 使用内置 `GITHUB_TOKEN` 推送镜像到 `ghcr.io`
 
-```bash
-sudo mkdir -p /opt/star-ring-capital
-sudo chown -R $USER:$USER /opt/star-ring-capital
-```
+首次使用建议到仓库 `Settings -> Actions -> General` 确认：
 
-3. 在服务器生成用于拉取 GitHub 的 Deploy Key：
+- Workflow permissions: `Read and write permissions`
 
-```bash
-ssh-keygen -t ed25519 -C "src-server-deploy" -f ~/.ssh/src_deploy_key -N ""
-cat ~/.ssh/src_deploy_key.pub
-```
+### 6.2 服务器一次性准备
 
-把公钥添加到 GitHub 仓库：
-
-- `Repo -> Settings -> Deploy keys -> Add deploy key`
-- 只读即可（无需写权限）
-
-4. 配置服务器 SSH：
-
-```bash
-cat >> ~/.ssh/config << 'EOF'
-Host github.com
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/src_deploy_key
-  IdentitiesOnly yes
-EOF
-chmod 600 ~/.ssh/config
-```
-
-5. 创建服务器环境变量文件 `/opt/star-ring-capital/.env`：
+1. 安装 `git`、`docker`、`docker-compose`（或 docker compose plugin）。
+2. 克隆仓库到 `/opt/star-ring-capital`（服务器需要 deploy key 读取 GitHub）。
+3. 准备 `/opt/star-ring-capital/.env`：
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@postgres:5432/star_ring_capital
@@ -145,42 +124,31 @@ NEXT_PUBLIC_SERVER_URL=https://your-domain.com
 SERVER_URL=https://your-domain.com
 SEED_ADMIN_EMAIL=admin@starringcapital.com
 SEED_ADMIN_PASSWORD=ChangeMe123!
+SRC_WEB_IMAGE=ghcr.io/muadibusul/star-ring-capital:latest
 ```
 
-### 6.2 GitHub Actions Secrets
+4. 如果 GHCR 镜像是私有包，服务器执行一次登录（PAT 需 `read:packages`）：
 
-在 `Settings -> Secrets and variables -> Actions` 配置：
+```bash
+echo "<YOUR_GITHUB_PAT>" | docker login ghcr.io -u MuadibUsul --password-stdin
+```
 
-- `SSH_HOST`
-- `SSH_PORT`（默认 22）
-- `SSH_USER`
-- `SSH_PRIVATE_KEY`（GitHub Actions 登录服务器的私钥）
-- `APP_DIR`（可选，默认 `/opt/star-ring-capital`）
-
-说明：
-
-- `SSH_PRIVATE_KEY` 是「GitHub Actions -> 服务器」使用
-- Deploy Key 是「服务器 -> GitHub」使用
-- 两者不是同一把 key
-
-### 6.3 首次部署
-
-1. 推送到 `main`
-2. 查看 GitHub Actions 的 `Deploy To Server` 是否成功
-3. 成功后服务器自动执行：
-   - 同步仓库到目标目录
-   - 执行 `bash scripts/server-deploy.sh`
-   - `docker compose -f docker-compose.prod.yml up -d --build --remove-orphans`
-4. 首次上线建议执行一次种子（创建默认管理员与页面内容）：
+5. 安装自动拉取定时任务：
 
 ```bash
 cd /opt/star-ring-capital
-docker compose -f docker-compose.prod.yml run --rm web npm run seed
+bash scripts/install-auto-pull.sh
+```
+
+### 6.3 首次部署
+
+```bash
+cd /opt/star-ring-capital
+bash scripts/server-deploy.sh
+docker-compose -f docker-compose.prod.yml run --rm web npm run seed
 ```
 
 ### 6.4 后续迭代
-
-每次迭代只需：
 
 ```bash
 git add .
@@ -188,33 +156,10 @@ git commit -m "feat: xxx"
 git push origin main
 ```
 
-### 6.5 `ssh: handshake failed: EOF` 一键替代方案（推荐大陆网络）
-
-如果 GitHub Actions 的 `Deploy via SSH` 偶发失败（常见于安全组/网络链路），可改为服务器主动拉取，不再依赖 GitHub 入站 SSH：
-
-1. 服务器执行一次安装（root）：
-
-```bash
-cd /opt/star-ring-capital
-bash scripts/install-auto-pull.sh
-```
-
-2. 查看定时器状态：
-
-```bash
-systemctl status src-auto-pull-deploy.timer --no-pager
-```
-
-3. 查看最近执行日志：
-
-```bash
-journalctl -u src-auto-pull-deploy.service -n 100 --no-pager
-```
-
 说明：
 
-- 定时器默认每 `2` 分钟检查一次 `origin/main`。
-- 有新提交就自动执行 `bash scripts/server-deploy.sh`。
+- GitHub 会构建并推送新镜像到 GHCR。
+- 服务器每 2 分钟检查一次主分支，有新提交就自动 `pull + up`。
 - 如需改频率：`INTERVAL_MINUTES=1 bash scripts/install-auto-pull.sh`。
 
 ## 7. 合规约束

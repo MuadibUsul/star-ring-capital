@@ -2,10 +2,7 @@ version: '3.9'
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: star-ring-capital:latest
+    image: ${SRC_WEB_IMAGE:-ghcr.io/muadibusul/star-ring-capital:latest}
     restart: unless-stopped
     env_file:
       - .env
