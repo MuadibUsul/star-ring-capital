@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { PageDocumentRenderer } from '@/components/page/PageDocumentRenderer'
 import { PageLivePreview } from '@/components/page/PageLivePreview'
-import { getRequestLocale } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/i18n-server'
 import { queryPageBySlug, querySiteSettings } from '@/lib/queries'
 
 export const dynamic = 'force-dynamic'

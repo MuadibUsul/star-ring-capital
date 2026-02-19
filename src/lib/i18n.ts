@@ -1,5 +1,3 @@
-import { cookies } from 'next/headers'
-
 export type SiteLocale = 'en' | 'zh'
 
 export const LOCALE_COOKIE_NAME = 'src-locale'
@@ -95,9 +93,3 @@ export const localizeNavLabel = ({
 
   return fallback
 }
-
-export const getRequestLocale = async (): Promise<SiteLocale> => {
-  const cookieStore = await cookies()
-  return normalizeLocale(cookieStore.get(LOCALE_COOKIE_NAME)?.value)
-}
-
