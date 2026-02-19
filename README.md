@@ -98,19 +98,28 @@ npm run start
 
 目标链路：
 
-`本地改代码 -> push 到 GitHub(main) -> GitHub Actions 构建并发布 GHCR 镜像 -> 服务器定时拉取代码并执行 web 滚动更新`
+`本地改代码 -> push 到 GitHub(main) -> GitHub Actions 构建并发布 GHCR 镜像 ->（可选）Actions 立即 SSH 触发服务器部署 -> timer 兜底自动追平`
 
 仓库内置：
 
-- 工作流：`.github/workflows/deploy.yml`（仅构建与发布镜像）
+- 工作流：`.github/workflows/deploy.yml`（构建/发布镜像 + 可选立即触发服务器部署）
 - 服务器脚本：`scripts/server-deploy.sh`（Compose v2-only，默认只滚动更新 `web`，失败自动回滚）
 - 定时拉取脚本：`scripts/install-auto-pull.sh`、`scripts/auto-pull-deploy.sh`
 - 生产编排：`docker-compose.prod.yml`
 
 ### 6.1 GitHub Actions 需要的权限
 
-- 不再需要 `SSH_HOST` / `SSH_USER` / `SSH_PRIVATE_KEY`
 - 使用内置 `GITHUB_TOKEN` 推送镜像到 `ghcr.io`
+- 若希望“每次 push 后立即部署到服务器”，需配置以下仓库 Secrets：
+  - `SSH_HOST`
+  - `SSH_USER`
+  - `SSH_PRIVATE_KEY`
+  - `SSH_PORT`（可选）
+
+说明：
+
+- 配置了上述 Secrets：镜像发布成功后，Actions 会立即 SSH 到服务器执行 `scripts/server-deploy.sh`。
+- 未配置 Secrets：仍使用服务器 timer 模式（每 2 分钟轮询一次）。
 
 首次使用建议到仓库 `Settings -> Actions -> General` 确认：
 
@@ -181,6 +190,7 @@ git push origin main
 说明：
 
 - GitHub 会构建并推送新镜像到 GHCR。
+- 若配置了 SSH Secrets，镜像发布后会立即触发一次服务器部署。
 - 服务器每 2 分钟检查一次主分支；仅有新提交时才执行部署（默认行为）。
 - 部署仅滚动更新 `web`，不会每次重建 `postgres`。
 - 如需改频率：`INTERVAL_MINUTES=1 bash scripts/install-auto-pull.sh`。
