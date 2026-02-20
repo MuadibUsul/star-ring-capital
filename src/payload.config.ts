@@ -13,6 +13,7 @@ import { ThemeSettings } from '@/globals/ThemeSettings'
 import { TrajectoryData } from '@/collections/TrajectoryData'
 import { EngagementCases } from '@/collections/EngagementCases'
 import { Research } from '@/collections/Research'
+import { StrategicSubmissions } from '@/collections/StrategicSubmissions'
 import { getServerSideURL } from '@/lib/getURL'
 
 const filename = fileURLToPath(import.meta.url)
@@ -54,7 +55,7 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Users, Media, Pages, TrajectoryData, EngagementCases, Research],
+  collections: [Users, Media, Pages, TrajectoryData, EngagementCases, Research, StrategicSubmissions],
   globals: [SiteSettings, ThemeSettings],
   cors: [getServerSideURL()].filter(Boolean),
   csrf: [getServerSideURL()].filter(Boolean),

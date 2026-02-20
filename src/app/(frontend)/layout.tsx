@@ -116,7 +116,11 @@ export default async function FrontendLayout({ children }: { children: React.Rea
           tagline={localizedTagline}
         />
         <main className="relative flex-1">{children}</main>
-        <SiteFooter footerNote={localizedFooterNote} siteName={localizedSiteName} />
+        <SiteFooter
+          footerNote={localizedFooterNote}
+          locale={locale}
+          siteName={localizedSiteName}
+        />
       </body>
     </html>
   )

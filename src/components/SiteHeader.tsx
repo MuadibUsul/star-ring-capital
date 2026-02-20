@@ -38,10 +38,15 @@ export async function SiteHeader({
   ctaLabel,
   ctaUrl,
 }: SiteHeaderProps) {
+  const primaryNavItems = navItems.slice(0, 5)
+  const rawCTALabel = ctaLabel || 'Strategic Collaboration'
+  const resolvedCTALabel =
+    locale === 'en' && rawCTALabel.length > 18 ? 'Strategic Intake' : rawCTALabel
+
   return (
     <header className="sticky top-0 z-50 border-b border-[color-mix(in_srgb,var(--src-accent)_20%,transparent)] bg-[color-mix(in_srgb,var(--src-bg)_88%,black_12%)]/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-10">
-        <Link className="flex min-w-0 items-center gap-3" href="/">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-10 lg:py-4">
+        <Link className="flex min-w-0 max-w-[220px] items-center gap-3" href="/">
           {logoUrl ? (
             <img alt={logoAlt || siteName} className="h-8 w-8 rounded-full object-cover lg:h-9 lg:w-9" src={logoUrl} />
           ) : (
@@ -50,7 +55,7 @@ export async function SiteHeader({
             </div>
           )}
           <div className="min-w-0">
-            <p className="font-heading text-sm uppercase tracking-[0.16em] text-[var(--src-text)] whitespace-nowrap">
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap font-heading text-[13px] uppercase tracking-[0.08em] text-[var(--src-text)] xl:text-sm xl:tracking-[0.12em]">
               {siteName}
             </p>
             <p className="hidden max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap text-[10px] uppercase tracking-[0.12em] text-[var(--src-muted)] xl:block">
@@ -60,9 +65,9 @@ export async function SiteHeader({
         </Link>
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 lg:flex xl:gap-6">
-          {navItems.map((item) => (
+          {primaryNavItems.map((item) => (
             <Link
-              className="whitespace-nowrap text-[11px] uppercase tracking-[0.1em] text-[var(--src-muted)] transition-colors hover:text-[var(--src-accent)] xl:text-xs xl:tracking-[0.12em]"
+              className="whitespace-nowrap text-[11px] uppercase tracking-[0.08em] text-[var(--src-muted)] transition-colors hover:text-[var(--src-accent)] xl:text-xs xl:tracking-[0.12em]"
               href={normalizePath(item.slug)}
               key={String(item.id)}
             >
@@ -75,11 +80,16 @@ export async function SiteHeader({
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 xl:gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           <LanguageSwitcher locale={locale} />
-          <Button asChild className="hidden max-w-[215px] lg:inline-flex" size="default" variant="ghost">
-            <Link className="truncate" href={ctaUrl || '/contact'}>
-              {ctaLabel || 'Strategic Collaboration'}
+          <Button
+            asChild
+            className="hidden h-10 w-[176px] overflow-hidden !px-4 text-[11px] tracking-[0.06em] xl:inline-flex"
+            size="default"
+            variant="ghost"
+          >
+            <Link className="w-full truncate text-center" href={ctaUrl || '/contact'}>
+              {resolvedCTALabel}
             </Link>
           </Button>
         </div>

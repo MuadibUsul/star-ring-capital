@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -26,7 +27,7 @@ type PageRendererProps = {
 }
 
 type TrajectoryPeriod = {
-  period: '1Y' | '3Y' | 'YTD'
+  period: '3Y' | '1Y' | '3M' | 'YTD'
   points: {
     label: string
     starRingCapital: number
@@ -58,6 +59,12 @@ const asDocArray = <T,>(value: unknown): T[] => {
 }
 
 const percent = (value: number) => `${value.toFixed(2)}%`
+const periodOrder: Record<TrajectoryPeriod['period'], number> = {
+  '3M': 0,
+  '1Y': 1,
+  '3Y': 2,
+  YTD: 3,
+}
 
 function OrbitLayer() {
   return (
@@ -76,9 +83,11 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
   }>(block.trajectoryData)
 
   const periods = asDocArray<TrajectoryPeriod>(trajectoryDoc?.periods)
-  const supportedPeriods = periods.filter((period) => Array.isArray(period.points) && period.points.length > 1)
-  const [currentPeriod, setCurrentPeriod] = useState<'1Y' | '3Y' | 'YTD'>(
-    (supportedPeriods[0]?.period as '1Y' | '3Y' | 'YTD') || '3Y',
+  const supportedPeriods = periods
+    .filter((period) => Array.isArray(period.points) && period.points.length > 1)
+    .sort((a, b) => periodOrder[a.period] - periodOrder[b.period])
+  const [currentPeriod, setCurrentPeriod] = useState<TrajectoryPeriod['period']>(
+    (supportedPeriods[0]?.period as TrajectoryPeriod['period']) || '3M',
   )
 
   const active = useMemo(
@@ -89,6 +98,31 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
   if (!active) {
     return null
   }
+
+  const capitalDomain = useMemo<[number, number]>(() => {
+    const values = active.points.flatMap((point) => [
+      point.starRingCapital,
+      point.globalEquityBenchmark,
+      point.riskFreeBenchmark,
+    ])
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const padding = Math.max((maxValue - minValue) * 0.22, 2)
+    const lower = Math.max(0, Math.floor((minValue - padding) / 5) * 5)
+    const upper = Math.ceil((maxValue + padding) / 5) * 5
+    return [lower, upper]
+  }, [active.points])
+
+  const legendLabel = {
+    starRingCapital: t(locale, { en: 'Star Ring Capital', zh: 'Star Ring Capital' }),
+    globalEquityBenchmark: t(locale, { en: 'Global Equity Benchmark', zh: '\u5168\u7403\u6743\u76ca\u57fa\u51c6' }),
+    riskFreeBenchmark: t(locale, { en: 'Risk-free Benchmark', zh: '\u65e0\u98ce\u9669\u57fa\u51c6' }),
+  }
+
+  const periodReturnLabel = t(locale, {
+    en: `${active.period} Return`,
+    zh: '\u533a\u95f4\u6536\u76ca\u7387',
+  })
 
   return (
     <section className="space-y-8">
@@ -120,15 +154,22 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
           <ResponsiveContainer>
             <LineChart data={active.points}>
               <CartesianGrid stroke="color-mix(in srgb, var(--src-accent) 14%, transparent)" vertical={false} />
+              <ReferenceLine
+                stroke="color-mix(in srgb, var(--src-accent) 30%, transparent)"
+                strokeDasharray="3 4"
+                y={100}
+              />
               <XAxis
                 dataKey="label"
                 stroke="color-mix(in srgb, var(--src-muted) 85%, white 15%)"
                 tick={{ fill: 'var(--src-muted)', fontSize: 11 }}
               />
               <YAxis
+                domain={capitalDomain}
                 stroke="color-mix(in srgb, var(--src-muted) 85%, white 15%)"
                 tick={{ fill: 'var(--src-muted)', fontSize: 11 }}
-                unit="%"
+                tickCount={6}
+                tickFormatter={(value: number) => `${value.toFixed(0)}%`}
               />
               <Tooltip
                 contentStyle={{
@@ -140,25 +181,30 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
               />
               <Line
                 dataKey="starRingCapital"
-                name={t(locale, { en: 'Star Ring Capital', zh: '星环资本' })}
+                dot={{ fill: 'var(--src-accent)', r: 3, strokeWidth: 0 }}
+                name={legendLabel.starRingCapital}
                 stroke="var(--src-accent)"
+                strokeLinecap="round"
                 strokeWidth={2.6}
-                type="monotone"
+                type="linear"
               />
               <Line
                 dataKey="globalEquityBenchmark"
-                name={t(locale, { en: 'Global Equity Benchmark', zh: '全球权益基准' })}
+                dot={{ fill: '#8b94aa', r: 2.4, strokeWidth: 0 }}
+                name={legendLabel.globalEquityBenchmark}
                 stroke="#8b94aa"
+                strokeLinecap="round"
                 strokeWidth={2}
-                type="monotone"
+                type="linear"
               />
               <Line
                 dataKey="riskFreeBenchmark"
-                name={t(locale, { en: 'Risk-free Benchmark', zh: '无风险基准' })}
+                dot={false}
+                name={legendLabel.riskFreeBenchmark}
                 stroke="#5e6578"
                 strokeDasharray="5 4"
                 strokeWidth={1.8}
-                type="monotone"
+                type="linear"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -167,26 +213,24 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
-            {t(locale, { en: '3Y CAGR', zh: '3年复合增长率' })}
-          </p>
+          <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">{periodReturnLabel}</p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.cagr)}</p>
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
-            {t(locale, { en: 'Max Drawdown', zh: '最大回撤' })}
+            {t(locale, { en: 'Max Drawdown', zh: '\u6700\u5927\u56de\u64a4' })}
           </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.maxDrawdown)}</p>
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
-            {t(locale, { en: 'Volatility', zh: '波动率' })}
+            {t(locale, { en: 'Volatility', zh: '\u6ce2\u52a8\u7387' })}
           </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{percent(active.metrics.volatility)}</p>
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-[0.15em] text-[var(--src-muted)]">
-            {t(locale, { en: 'Sharpe Ratio', zh: '夏普比率' })}
+            {t(locale, { en: 'Sharpe Ratio', zh: '\u590f\u666e\u6bd4\u7387' })}
           </p>
           <p className="mt-3 font-heading text-3xl text-[var(--src-accent)]">{active.metrics.sharpeRatio.toFixed(2)}</p>
         </Card>
@@ -202,23 +246,49 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
     </section>
   )
 }
-
 function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const summary = Array.from(formData.entries())
-      .map(([key, value]) => `${key}: ${String(value)}`)
-      .join('%0A')
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const entries = Array.from(formData.entries())
+      .map(([key, value]) => ({
+        label: String(key).trim(),
+        value: String(value).trim(),
+      }))
+      .filter((item) => item.label.length > 0 && item.value.length > 0)
 
-    const subject = encodeURIComponent(
-      t(locale, {
-        en: 'Strategic Alignment Inquiry',
-        zh: '战略协同咨询',
-      }),
-    )
+    if (entries.length === 0) {
+      setSubmitState('error')
+      return
+    }
 
-    window.location.href = `mailto:${block.email}?subject=${subject}&body=${summary}`
+    setSubmitState('submitting')
+
+    try {
+      const response = await fetch('/api/strategic-collaboration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          locale,
+          sourcePage: window.location.pathname,
+          entries,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('submission failed')
+      }
+
+      form.reset()
+      setSubmitState('success')
+    } catch {
+      setSubmitState('error')
+    }
   }
 
   return (
@@ -261,12 +331,30 @@ function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
               )
             })}
 
-            <Button type="submit">
+            <Button disabled={submitState === 'submitting'} type="submit">
               {t(locale, {
-                en: 'Submit Alignment Request',
-                zh: '提交协同申请',
+                en: submitState === 'submitting' ? 'Submitting...' : 'Submit Alignment Request',
+                zh: submitState === 'submitting' ? '\u63d0\u4ea4\u4e2d...' : '\u63d0\u4ea4\u534f\u540c\u7533\u8bf7',
               })}
             </Button>
+
+            {submitState === 'success' ? (
+              <p className="text-xs text-[var(--src-accent)]">
+                {t(locale, {
+                  en: 'Received. Our team will review and follow up shortly.',
+                  zh: '\u5df2\u6536\u5230\uff0c\u6211\u4eec\u4f1a\u5c3d\u5feb\u8bc4\u4f30\u5e76\u8054\u7cfb\u4f60\u3002',
+                })}
+              </p>
+            ) : null}
+
+            {submitState === 'error' ? (
+              <p className="text-xs text-[var(--src-muted)]">
+                {t(locale, {
+                  en: 'Submission failed. Please retry or email us directly.',
+                  zh: '\u63d0\u4ea4\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u6216\u76f4\u63a5\u53d1\u9001\u90ae\u4ef6\u8054\u7cfb\u3002',
+                })}
+              </p>
+            ) : null}
           </form>
         </Card>
       ) : null}
@@ -290,7 +378,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                 <p className="text-xs uppercase tracking-[0.2em] text-[var(--src-accent)]">
                   {t(locale, {
                     en: 'Private Capital Structure Office',
-                    zh: '私域资本结构办公室',
+                    zh: '\u79c1\u57df\u8d44\u672c\u7ed3\u6784\u529e\u516c\u5ba4',
                   })}
                 </p>
                 <h1 className="font-heading text-5xl leading-tight text-[var(--src-text)] lg:text-7xl">{block.brandName}</h1>
@@ -301,7 +389,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                       {block.primaryCTA?.label ||
                         t(locale, {
                           en: 'Explore Philosophy',
-                          zh: '探索理念',
+                          zh: '\u63a2\u7d22\u7406\u5ff5',
                         })}
                     </Link>
                   </Button>
@@ -310,7 +398,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                       {block.secondaryCTA?.label ||
                         t(locale, {
                           en: 'Strategic Collaboration',
-                          zh: '战略协作',
+                          zh: '\u6218\u7565\u534f\u4f5c',
                         })}
                     </Link>
                   </Button>
@@ -395,7 +483,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                 {asDocArray<any>(block.layers).map((layer, layerIndex) => (
                   <Card key={`${layer.layerName}-${layerIndex}`}>
                     <p className="text-xs uppercase tracking-[0.16em] text-[var(--src-accent)]">
-                      {t(locale, { en: 'Layer', zh: '层级' })} {layerIndex + 1}
+                      {t(locale, { en: 'Layer', zh: '\u5c42\u7ea7' })} {layerIndex + 1}
                     </p>
                     <p className="mt-2 font-heading text-xl text-[var(--src-text)]">{layer.layerName}</p>
                     <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{layer.purpose}</p>
@@ -450,7 +538,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                   <img alt={portrait.alt || block.heading} className="h-full min-h-[360px] w-full object-cover" src={portrait.url} />
                 ) : (
                   <div className="grid min-h-[360px] place-items-center text-sm text-[var(--src-muted)]">
-                    {t(locale, { en: 'Founder Portrait', zh: '创始人肖像' })}
+                    {t(locale, { en: 'Founder Portrait', zh: '\u521b\u59cb\u4eba\u8096\u50cf' })}
                   </div>
                 )}
               </Card>
@@ -479,3 +567,4 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
     </article>
   )
 }
+

@@ -65,7 +65,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
         aria-expanded={open}
         aria-haspopup="menu"
         className={cn(
-          'inline-flex h-10 items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--src-accent)_34%,transparent)] bg-[color-mix(in_srgb,var(--src-bg)_72%,black_28%)] px-4 text-[11px] uppercase tracking-[0.12em] text-[var(--src-text)] transition-colors',
+          'inline-flex h-10 min-w-[92px] items-center justify-between gap-2 rounded-full border border-[color-mix(in_srgb,var(--src-accent)_34%,transparent)] bg-[color-mix(in_srgb,var(--src-bg)_72%,black_28%)] px-4 text-[11px] tracking-[0.12em] text-[var(--src-text)] transition-colors',
           'hover:border-[color-mix(in_srgb,var(--src-accent)_50%,transparent)] hover:text-[var(--src-accent)]',
           open && 'border-[color-mix(in_srgb,var(--src-accent)_60%,transparent)] text-[var(--src-accent)]',
         )}
@@ -73,7 +73,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
         onClick={() => setOpen((prev) => !prev)}
         type="button"
       >
-        <span>{currentLabel}</span>
+        <span className="whitespace-nowrap leading-none">{currentLabel}</span>
         <ChevronDown
           className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')}
           strokeWidth={1.8}
@@ -88,7 +88,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
             return (
               <button
                 className={cn(
-                  'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[11px] uppercase tracking-[0.12em] transition-colors',
+                  'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[11px] tracking-[0.12em] transition-colors',
                   active
                     ? 'bg-[color-mix(in_srgb,var(--src-accent)_22%,transparent)] text-[var(--src-accent)]'
                     : 'text-[var(--src-muted)] hover:bg-[color-mix(in_srgb,var(--src-accent)_10%,transparent)] hover:text-[var(--src-text)]',
@@ -99,8 +99,8 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
                 role="menuitem"
                 type="button"
               >
-                <span>{option.label}</span>
-                {active ? <span className="text-[var(--src-accent)]">•</span> : null}
+                <span className="whitespace-nowrap leading-none">{option.label}</span>
+                {active ? <span className="text-[var(--src-accent)]">✓</span> : null}
               </button>
             )
           })}
@@ -109,4 +109,3 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
     </div>
   )
 }
-

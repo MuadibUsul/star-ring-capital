@@ -158,9 +158,10 @@ const run = async () => {
         period: '3Y',
         points: [
           { label: '2023 Q1', starRingCapital: 100, globalEquityBenchmark: 100, riskFreeBenchmark: 100 },
-          { label: '2023 Q4', starRingCapital: 109, globalEquityBenchmark: 104, riskFreeBenchmark: 103 },
-          { label: '2024 Q2', starRingCapital: 116, globalEquityBenchmark: 108, riskFreeBenchmark: 105 },
-          { label: '2024 Q4', starRingCapital: 123, globalEquityBenchmark: 112, riskFreeBenchmark: 108 },
+          { label: '2023 Q4', starRingCapital: 108, globalEquityBenchmark: 104, riskFreeBenchmark: 103 },
+          { label: '2024 Q2', starRingCapital: 104, globalEquityBenchmark: 101, riskFreeBenchmark: 104.5 },
+          { label: '2024 Q4', starRingCapital: 119, globalEquityBenchmark: 109, riskFreeBenchmark: 107.5 },
+          { label: '2025 Q2', starRingCapital: 114, globalEquityBenchmark: 106, riskFreeBenchmark: 109 },
           { label: '2025 Q4', starRingCapital: 132, globalEquityBenchmark: 118, riskFreeBenchmark: 111 },
         ],
         metrics: {
@@ -174,9 +175,9 @@ const run = async () => {
         period: '1Y',
         points: [
           { label: '2025 Jan', starRingCapital: 100, globalEquityBenchmark: 100, riskFreeBenchmark: 100 },
-          { label: '2025 Apr', starRingCapital: 103, globalEquityBenchmark: 101, riskFreeBenchmark: 101 },
-          { label: '2025 Jul', starRingCapital: 108, globalEquityBenchmark: 104, riskFreeBenchmark: 102 },
-          { label: '2025 Oct', starRingCapital: 112, globalEquityBenchmark: 106, riskFreeBenchmark: 103 },
+          { label: '2025 Apr', starRingCapital: 104, globalEquityBenchmark: 101.5, riskFreeBenchmark: 101 },
+          { label: '2025 Jul', starRingCapital: 101.2, globalEquityBenchmark: 98.8, riskFreeBenchmark: 102 },
+          { label: '2025 Oct', starRingCapital: 111, globalEquityBenchmark: 105.4, riskFreeBenchmark: 103 },
           { label: '2025 Dec', starRingCapital: 116, globalEquityBenchmark: 108, riskFreeBenchmark: 104 },
         ],
         metrics: {
@@ -187,10 +188,27 @@ const run = async () => {
         },
       },
       {
+        period: '3M',
+        points: [
+          { label: '2025 Nov', starRingCapital: 100, globalEquityBenchmark: 100, riskFreeBenchmark: 100 },
+          { label: '2025 Dec', starRingCapital: 103.6, globalEquityBenchmark: 101.7, riskFreeBenchmark: 100.6 },
+          { label: '2026 Jan', starRingCapital: 101.1, globalEquityBenchmark: 100.4, riskFreeBenchmark: 101.1 },
+          { label: '2026 Feb', starRingCapital: 105.2, globalEquityBenchmark: 102.2, riskFreeBenchmark: 101.4 },
+        ],
+        metrics: {
+          cagr: 5.2,
+          maxDrawdown: -2.4,
+          volatility: 4.8,
+          sharpeRatio: 1.44,
+        },
+      },
+      {
         period: 'YTD',
         points: [
           { label: 'Jan', starRingCapital: 100, globalEquityBenchmark: 100, riskFreeBenchmark: 100 },
-          { label: 'Feb', starRingCapital: 101.8, globalEquityBenchmark: 100.9, riskFreeBenchmark: 100.4 },
+          { label: 'Feb', starRingCapital: 102.4, globalEquityBenchmark: 101.2, riskFreeBenchmark: 100.4 },
+          { label: 'Mar', starRingCapital: 101.3, globalEquityBenchmark: 100.1, riskFreeBenchmark: 100.8 },
+          { label: 'Apr', starRingCapital: 104.1, globalEquityBenchmark: 102.2, riskFreeBenchmark: 101.1 },
         ],
         metrics: {
           cagr: 11.2,
@@ -411,7 +429,7 @@ const run = async () => {
     seo: {
       title: 'Capital Trajectory | Star Ring Capital',
       description:
-        'Three-year, one-year, and YTD trajectory visualization benchmarked against global equity and risk-free curves.',
+        'Three-year, one-year, three-month, and YTD trajectory visualization benchmarked against global equity and risk-free curves.',
     },
     _status: 'published',
   })

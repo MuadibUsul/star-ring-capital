@@ -73,6 +73,7 @@ export interface Config {
     'trajectory-data': TrajectoryDatum;
     'engagement-cases': EngagementCase;
     research: Research;
+    'strategic-submissions': StrategicSubmission;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +88,7 @@ export interface Config {
     'trajectory-data': TrajectoryDataSelect<false> | TrajectoryDataSelect<true>;
     'engagement-cases': EngagementCasesSelect<false> | EngagementCasesSelect<true>;
     research: ResearchSelect<false> | ResearchSelect<true>;
+    'strategic-submissions': StrategicSubmissionsSelect<false> | StrategicSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -308,7 +310,7 @@ export interface TrajectoryDatum {
   title: string;
   active?: boolean | null;
   periods: {
-    period: '3Y' | '1Y' | 'YTD';
+    period: '3Y' | '1Y' | '3M' | 'YTD';
     points: {
       label: string;
       starRingCapital: number;
@@ -440,6 +442,38 @@ export interface Research {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Strategic collaboration leads submitted from the public website.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "strategic-submissions".
+ */
+export interface StrategicSubmission {
+  id: number;
+  status: 'new' | 'in_review' | 'qualified' | 'archived';
+  priority?: ('high' | 'normal' | 'low') | null;
+  contactName: string;
+  contactEmail?: string | null;
+  organization?: string | null;
+  phone?: string | null;
+  locale?: ('en' | 'zh') | null;
+  sourcePage?: string | null;
+  message?: string | null;
+  submittedAt: string;
+  entries?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Internal follow-up notes (not visible to public users).
+   */
+  internalNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -580,6 +614,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'research';
         value: number | Research;
+      } | null)
+    | ({
+        relationTo: 'strategic-submissions';
+        value: number | StrategicSubmission;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -928,6 +966,32 @@ export interface ResearchSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "strategic-submissions_select".
+ */
+export interface StrategicSubmissionsSelect<T extends boolean = true> {
+  status?: T;
+  priority?: T;
+  contactName?: T;
+  contactEmail?: T;
+  organization?: T;
+  phone?: T;
+  locale?: T;
+  sourcePage?: T;
+  message?: T;
+  submittedAt?: T;
+  entries?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  internalNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -30,7 +30,7 @@ export const TrajectoryData: CollectionConfig = {
       name: 'periods',
       type: 'array',
       minRows: 1,
-      maxRows: 3,
+      maxRows: 4,
       required: true,
       fields: [
         {
@@ -45,6 +45,10 @@ export const TrajectoryData: CollectionConfig = {
             {
               label: '1Y',
               value: '1Y',
+            },
+            {
+              label: '3M',
+              value: '3M',
             },
             {
               label: 'YTD',

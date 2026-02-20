@@ -1,9 +1,12 @@
+import { type SiteLocale } from '@/lib/i18n'
+
 type SiteFooterProps = {
+  locale: SiteLocale
   siteName: string
   footerNote: string
 }
 
-export function SiteFooter({ siteName, footerNote }: SiteFooterProps) {
+export function SiteFooter({ locale: _locale, siteName, footerNote }: SiteFooterProps) {
   return (
     <footer className="border-t border-[color-mix(in_srgb,var(--src-accent)_20%,transparent)] py-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-6 lg:px-10">

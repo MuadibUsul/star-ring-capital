@@ -7,8 +7,13 @@ node_modules
 .vercel
 .pgdata
 .pgpass-init.txt
+.pg_local_data/
+.pg_local.log
+.pg_local_password.txt
 dev.log
+dev-local.log
 qc
+tsconfig.tsbuildinfo
 
 # Payload default media upload directory
 public/media/

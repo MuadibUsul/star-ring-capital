@@ -20,6 +20,32 @@ const normalizeSlug = (raw?: string) => {
   return decodeURIComponent(raw)
 }
 
+const homeExpandedSlugs = ['strategic-engagement', 'founder', 'contact'] as const
+
+const withExpandedHomeSections = async ({
+  draft,
+  page,
+}: {
+  draft: boolean
+  page: any
+}) => {
+  if (!page || page.slug !== 'home') {
+    return page
+  }
+
+  const relatedPages = await Promise.all(
+    homeExpandedSlugs.map((targetSlug) => queryPageBySlug({ draft, slug: targetSlug })),
+  )
+
+  const homeLayout = Array.isArray(page.layout) ? page.layout : []
+  const extraLayouts = relatedPages.flatMap((doc) => (Array.isArray(doc?.layout) ? doc.layout : []))
+
+  return {
+    ...page,
+    layout: [...homeLayout, ...extraLayouts],
+  }
+}
+
 export default async function PageRoute({ params }: PageProps) {
   const { isEnabled: draft } = await draftMode()
   const locale = await getRequestLocale()
@@ -32,11 +58,16 @@ export default async function PageRoute({ params }: PageProps) {
     notFound()
   }
 
+  const renderedPage = await withExpandedHomeSections({
+    draft,
+    page,
+  })
+
   if (draft) {
-    return <PageLivePreview initialData={page} locale={locale} />
+    return <PageLivePreview initialData={renderedPage} locale={locale} />
   }
 
-  return <PageDocumentRenderer locale={locale} page={page} />
+  return <PageDocumentRenderer locale={locale} page={renderedPage} />
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
