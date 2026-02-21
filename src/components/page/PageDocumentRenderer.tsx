@@ -568,7 +568,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
           const portrait = asDoc<{ url?: string; alt?: string }>(block.portrait)
 
           return (
-            <section className="grid gap-6 lg:grid-cols-[1.1fr_1.4fr]" key={key}>
+            <section className="grid items-start gap-6 lg:grid-cols-[1.1fr_1.4fr]" key={key}>
               <Card className="overflow-hidden p-0">
                 {portrait?.url ? (
                   <img alt={localize(locale, portrait.alt || block.heading)} className="h-full min-h-[360px] w-full object-cover" src={portrait.url} />
@@ -579,7 +579,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                 )}
               </Card>
 
-              <Card>
+              <Card className="self-start">
                 <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
                 <p className="mt-4 text-sm leading-7 text-[var(--src-muted)]">{localize(locale, block.narrative)}</p>
                 <div className="mt-6 space-y-3">
