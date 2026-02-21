@@ -5,7 +5,7 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'self'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://www.gravatar.com https://secure.gravatar.com https://*.gravatar.com",
   "object-src 'none'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
