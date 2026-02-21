@@ -69,6 +69,18 @@ const periodOrder: Record<TrajectoryPeriod['period'], number> = {
   '3Y': 2,
   YTD: 3,
 }
+const periodLabel = (locale: SiteLocale, period: TrajectoryPeriod['period']) => {
+  if (locale === 'en') return period
+
+  const labels: Record<TrajectoryPeriod['period'], string> = {
+    '3M': '\u0033\u4e2a\u6708',
+    '1Y': '\u0031\u5e74',
+    '3Y': '\u0033\u5e74',
+    YTD: '\u5e74\u5185',
+  }
+
+  return labels[period]
+}
 
 function OrbitLayer() {
   return (
@@ -163,7 +175,7 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
             onClick={() => setCurrentPeriod(period.period)}
             type="button"
           >
-            {period.period}
+            {periodLabel(locale, period.period)}
           </button>
         ))}
       </div>
