@@ -100,7 +100,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
                 type="button"
               >
                 <span className="whitespace-nowrap leading-none">{option.label}</span>
-                {active ? <span className="text-[var(--src-accent)]">\u2713</span> : null}
+                {active ? <span className="text-[var(--src-accent)]">{'\u2713'}</span> : null}
               </button>
             )
           })}
