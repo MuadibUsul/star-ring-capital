@@ -22,6 +22,20 @@ const navLabelZhBySlug: Record<string, string> = {
 }
 
 const legacyExtrasZhByEn: Record<string, string> = {
+  'A four-layer risk architecture balancing strategy continuity, tactical agility, and drawdown protection.':
+    '\u56db\u5c42\u98ce\u9669\u67b6\u6784\uff0c\u5728\u6218\u7565\u8fde\u7eed\u6027\u3001\u6218\u672f\u654f\u6377\u6027\u4e0e\u56de\u64a4\u9632\u62a4\u4e4b\u95f4\u53d6\u5f97\u5e73\u8861\u3002',
+  'A framework of value core and structural flow for long-horizon influence and risk-balanced growth.':
+    '\u4ee5\u4ef7\u503c\u5185\u6838\u4e0e\u7ed3\u6784\u6d41\u52a8\u6784\u6210\u7684\u6846\u67b6\uff0c\u670d\u52a1\u957f\u671f\u5f71\u54cd\u529b\u4e0e\u98ce\u9669\u5e73\u8861\u589e\u957f\u3002',
+  'A private capital structure office shaping durable outcomes through disciplined architecture, cross-cycle adaptability, and controlled risk.':
+    '\u901a\u8fc7\u7eaa\u5f8b\u5316\u67b6\u6784\u3001\u8de8\u5468\u671f\u9002\u5e94\u4e0e\u53ef\u63a7\u98ce\u9669\uff0c\u6784\u5efa\u53ef\u6301\u7eed\u6210\u679c\u7684\u79c1\u57df\u8d44\u672c\u7ed3\u6784\u529e\u516c\u5ba4\u3002',
+  'Adjusts exposure weights through controlled rotational logic without compromising core structure.':
+    '\u5728\u4e0d\u7834\u574f\u6838\u5fc3\u7ed3\u6784\u7684\u524d\u63d0\u4e0b\uff0c\u901a\u8fc7\u53ef\u63a7\u8f6e\u52a8\u903b\u8f91\u8c03\u6574\u655e\u53e3\u6743\u91cd\u3002',
+  'Cross-asset integration designed to preserve flexibility while maintaining directional coherence.':
+    '\u8de8\u8d44\u4ea7\u6574\u5408\u8bbe\u8ba1\uff0c\u5728\u4fdd\u6301\u65b9\u5411\u4e00\u81f4\u6027\u7684\u540c\u65f6\u4fdd\u7559\u7075\u6d3b\u6027\u3002',
+  'Cross-cycle review notes will summarize allocation logic and risk architecture evolution.':
+    '\u8de8\u5468\u671f\u590d\u76d8\u7b14\u8bb0\u5c06\u603b\u7ed3\u914d\u7f6e\u903b\u8f91\u4e0e\u98ce\u9669\u67b6\u6784\u6f14\u8fdb\u3002',
+  'Defines long-horizon positioning ranges aligned with capital mission and regime probabilities.':
+    '\u5b9a\u4e49\u4e0e\u8d44\u672c\u4f7f\u547d\u53ca\u5e02\u573a\u72b6\u6001\u6982\u7387\u76f8\u4e00\u81f4\u7684\u957f\u671f\u4ed3\u4f4d\u533a\u95f4\u3002',
   'Coordinate equity, fixed income, and liquidity sleeves under unified risk budgets.':
     '\u5728\u7edf\u4e00\u98ce\u9669\u9884\u7b97\u4e0b\u534f\u8c03\u80a1\u6743\u3001\u56fa\u6536\u4e0e\u6d41\u52a8\u6027\u4ed3\u4f4d\u3002',
   'Control concentration through correlation-aware structural balancing.':
@@ -34,6 +48,42 @@ const legacyExtrasZhByEn: Record<string, string> = {
     '\u4f7f\u7528\u5206\u5c42\u65f6\u70b9\u6846\u67b6\u878d\u5408\u9632\u5b88\u4e0e\u8fdb\u653b\u59ff\u6001\u3002',
   'Sustain trajectory integrity through proactive structural adjustments.':
     '\u901a\u8fc7\u4e3b\u52a8\u7ed3\u6784\u8c03\u6574\u7ef4\u6301\u8f68\u8ff9\u5b8c\u6574\u6027\u3002',
+  'Founder profile focused on methodology, structural capability, and risk philosophy.':
+    '\u805a\u7126\u65b9\u6cd5\u8bba\u3001\u7ed3\u6784\u80fd\u529b\u4e0e\u98ce\u9669\u54f2\u5b66\u7684\u521b\u59cb\u4eba\u4ecb\u7ecd\u3002',
+  'Future institutional research and whitepaper module entrance.':
+    '\u672a\u6765\u673a\u6784\u7814\u7a76\u4e0e\u767d\u76ae\u4e66\u6a21\u5757\u5165\u53e3\u3002',
+  'High-end capital IP site focused on structure, risk architecture, and stable growth across market cycles.':
+    '\u805a\u7126\u7ed3\u6784\u3001\u98ce\u9669\u67b6\u6784\u4e0e\u8de8\u5468\u671f\u7a33\u5b9a\u589e\u957f\u7684\u9ad8\u7aef\u8d44\u672c IP \u7ad9\u70b9\u3002',
+  'Implements defensive overlays to contain left-tail events and reduce volatility shocks.':
+    '\u5b9e\u65bd\u9632\u5fa1\u6027\u8986\u76d6\u5c42\uff0c\u7ea6\u675f\u5de6\u5c3e\u4e8b\u4ef6\u5e76\u964d\u4f4e\u6ce2\u52a8\u51b2\u51fb\u3002',
+  'Layered control systems prioritize continuity, drawdown governance, and scenario resilience.':
+    '\u5206\u5c42\u63a7\u5236\u7cfb\u7edf\u4f18\u5148\u4fdd\u969c\u8fde\u7eed\u6027\u3001\u56de\u64a4\u6cbb\u7406\u4e0e\u60c5\u666f\u97e7\u6027\u3002',
+  'Long-form structural analysis for institutional execution frameworks will be released in phases.':
+    '\u9762\u5411\u673a\u6784\u6267\u884c\u6846\u67b6\u7684\u957f\u7bc7\u7ed3\u6784\u5206\u6790\u5c06\u5206\u9636\u6bb5\u53d1\u5e03\u3002',
+  'Maintains reserve liquidity to preserve maneuverability during stress and dislocation windows.':
+    '\u7ef4\u6301\u50a8\u5907\u6d41\u52a8\u6027\uff0c\u786e\u4fdd\u5728\u538b\u529b\u4e0e\u9519\u4f4d\u7a97\u53e3\u4e2d\u4fdd\u6709\u673a\u52a8\u80fd\u529b\u3002',
+  'Private operational memos can be enabled for strategic partners under controlled access.':
+    '\u5728\u53ef\u63a7\u8bbf\u95ee\u6743\u9650\u4e0b\uff0c\u53ef\u4e3a\u6218\u7565\u5408\u4f5c\u65b9\u542f\u7528\u5185\u90e8\u8fd0\u8425\u5907\u5fd8\u3002',
+  'Ring represents circulation, allocation pathways, and dynamic rebalancing under shifting conditions.':
+    'Ring \u4ee3\u8868\u8d44\u672c\u5faa\u73af\u3001\u914d\u7f6e\u8def\u5f84\u4e0e\u5728\u73af\u5883\u53d8\u5316\u4e2d\u7684\u52a8\u6001\u518d\u5e73\u8861\u3002',
+  'Star represents a value kernel anchored in repeatable judgment, discipline, and asymmetry awareness.':
+    'Star \u4ee3\u8868\u4ef7\u503c\u5185\u6838\uff0c\u951a\u5b9a\u53ef\u590d\u73b0\u5224\u65ad\u3001\u7eaa\u5f8b\u7ea6\u675f\u4e0e\u4e0d\u5bf9\u79f0\u8ba4\u77e5\u3002',
+  'Star Ring Capital | Private Capital Structure Office':
+    '\u661f\u73af\u8d44\u672c | \u79c1\u57df\u8d44\u672c\u7ed3\u6784\u529e\u516c\u5ba4',
+  'Strategic alignment contact channel for Star Ring Capital.':
+    '\u661f\u73af\u8d44\u672c\u6218\u7565\u540c\u9891\u534f\u4f5c\u8054\u7cfb\u901a\u9053\u3002',
+  'Strategic capital architecture, multi-asset allocation, and cross-cycle rotation capabilities.':
+    '\u6218\u7565\u8d44\u672c\u67b6\u6784\u3001\u591a\u8d44\u4ea7\u914d\u7f6e\u4e0e\u8de8\u5468\u671f\u8f6e\u52a8\u80fd\u529b\u3002',
+  'Structured influence over emotional allocation. Conviction is expressed through architecture, not noise.':
+    '\u4ee5\u7ed3\u6784\u5316\u5f71\u54cd\u529b\u66ff\u4ee3\u60c5\u7eea\u5316\u914d\u7f6e\uff0c\u4fe1\u5ff5\u901a\u8fc7\u67b6\u6784\u8868\u8fbe\uff0c\u800c\u975e\u566a\u97f3\u9a71\u52a8\u3002',
+  'The founder builds private capital structure systems that convert macro complexity into executable architecture. The operating doctrine prioritizes disciplined risk governance, structural adaptation, and continuity through cycle transitions.':
+    '\u521b\u59cb\u4eba\u4e13\u6ce8\u6784\u5efa\u79c1\u57df\u8d44\u672c\u7ed3\u6784\u7cfb\u7edf\uff0c\u5c06\u5b8f\u89c2\u590d\u6742\u6027\u8f6c\u5316\u4e3a\u53ef\u6267\u884c\u67b6\u6784\u3002\u65b9\u6cd5\u8bba\u5f3a\u8c03\u7eaa\u5f8b\u5316\u98ce\u9669\u6cbb\u7406\u3001\u7ed3\u6784\u81ea\u9002\u5e94\u4e0e\u8de8\u5468\u671f\u8fde\u7eed\u6027\u3002',
+  'Three-year, one-year, and YTD trajectory visualization benchmarked against global equity and risk-free curves.':
+    '\u57fa\u4e8e\u5168\u7403\u6743\u76ca\u4e0e\u65e0\u98ce\u9669\u66f2\u7ebf\u5bf9\u7167\u7684\u4e09\u5e74\u3001\u4e00\u5e74\u4e0e\u5e74\u5185\u8f68\u8ff9\u53ef\u89c6\u5316\u3002',
+  'Trajectory reporting emphasizes stability, drawdown control, and risk-adjusted quality instead of volatility-driven outperformance narratives.':
+    '\u8f68\u8ff9\u6295\u544a\u5f3a\u8c03\u7a33\u5b9a\u6027\u3001\u56de\u64a4\u63a7\u5236\u4e0e\u98ce\u9669\u8c03\u6574\u540e\u8d28\u91cf\uff0c\u800c\u975e\u6ce2\u52a8\u9a71\u52a8\u7684\u8d85\u989d\u53d9\u4e8b\u3002',
+  'When value core and structural flow align, capital compounds through consistency rather than episodic outcomes.':
+    '\u5f53\u4ef7\u503c\u6838\u5fc3\u4e0e\u7ed3\u6784\u6d41\u52a8\u540c\u9891\u65f6\uff0c\u8d44\u672c\u901a\u8fc7\u4e00\u81f4\u6027\u800c\u975e\u5076\u53d1\u6027\u7ed3\u679c\u5b9e\u73b0\u590d\u5229\u3002',
   'Strategic campaigns are shared as structured battle narratives focused on judgment quality, risk handling, and result characteristics.':
     '\u6218\u7565\u9879\u76ee\u4ee5\u7ed3\u6784\u5316\u6218\u5f79\u53d9\u4e8b\u5448\u73b0\uff0c\u91cd\u70b9\u5c55\u793a\u5224\u65ad\u8d28\u91cf\u3001\u98ce\u9669\u5904\u7406\u4e0e\u7ed3\u679c\u7279\u5f81\u3002',
   'Reframed the risk budget from directional beta to stability-weighted spread capture.':
