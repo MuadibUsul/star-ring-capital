@@ -19,7 +19,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/cn'
-import { t, type SiteLocale } from '@/lib/i18n'
+import { localizeOptionalField, t, type SiteLocale } from '@/lib/i18n'
 
 type PageRendererProps = {
   page: any
@@ -56,6 +56,10 @@ const asDocArray = <T,>(value: unknown): T[] => {
   }
 
   return value.filter((item) => item && typeof item === 'object') as T[]
+}
+
+const localize = (locale: SiteLocale, value?: string | null) => {
+  return localizeOptionalField({ locale, value })
 }
 
 const percent = (value: number) => `${value.toFixed(2)}%`
@@ -99,6 +103,15 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
     return null
   }
 
+  const localizedPoints = useMemo(
+    () =>
+      active.points.map((point) => ({
+        ...point,
+        label: localize(locale, point.label),
+      })),
+    [active.points, locale],
+  )
+
   const capitalDomain = useMemo<[number, number]>(() => {
     const values = active.points.flatMap((point) => [
       point.starRingCapital,
@@ -114,9 +127,15 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
   }, [active.points])
 
   const legendLabel = {
-    starRingCapital: t(locale, { en: 'Star Ring Capital', zh: 'Star Ring Capital' }),
-    globalEquityBenchmark: t(locale, { en: 'Global Equity Benchmark', zh: '\u5168\u7403\u6743\u76ca\u57fa\u51c6' }),
-    riskFreeBenchmark: t(locale, { en: 'Risk-free Benchmark', zh: '\u65e0\u98ce\u9669\u57fa\u51c6' }),
+    starRingCapital: t(locale, { en: 'Star Ring Capital', zh: '\u661f\u73af\u8d44\u672c' }),
+    globalEquityBenchmark: t(locale, {
+      en: 'Global Equity Benchmark',
+      zh: '\u5168\u7403\u6743\u76ca\u57fa\u51c6',
+    }),
+    riskFreeBenchmark: t(locale, {
+      en: 'Risk-free Benchmark',
+      zh: '\u65e0\u98ce\u9669\u57fa\u51c6',
+    }),
   }
 
   const periodReturnLabel = t(locale, {
@@ -127,8 +146,8 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
   return (
     <section className="space-y-8">
       <div className="space-y-3">
-        <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
-        <p className="max-w-3xl text-sm leading-7 text-[var(--src-muted)]">{block.description}</p>
+        <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
+        <p className="max-w-3xl text-sm leading-7 text-[var(--src-muted)]">{localize(locale, block.description)}</p>
       </div>
 
       <div className="flex gap-2">
@@ -152,7 +171,7 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
       <Card className="p-0">
         <div className="h-[360px] w-full px-2 pt-6 sm:px-6">
           <ResponsiveContainer>
-            <LineChart data={active.points}>
+            <LineChart data={localizedPoints}>
               <CartesianGrid stroke="color-mix(in srgb, var(--src-accent) 14%, transparent)" vertical={false} />
               <ReferenceLine
                 stroke="color-mix(in srgb, var(--src-accent) 30%, transparent)"
@@ -239,13 +258,14 @@ function TrajectoryChart({ block, locale }: { block: any; locale: SiteLocale }) 
       <div className="space-y-2 border-t border-[color-mix(in_srgb,var(--src-accent)_25%,transparent)] pt-5">
         {asDocArray<{ statement?: string }>(trajectoryDoc?.complianceStatements).map((item, index) => (
           <p className="text-xs text-[var(--src-muted)]" key={`${item.statement}-${index}`}>
-            {item.statement}
+            {localize(locale, item.statement)}
           </p>
         ))}
       </div>
     </section>
   )
 }
+
 function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
 
@@ -293,8 +313,8 @@ function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
 
   return (
     <section className="space-y-6">
-      <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
-      <p className="text-sm text-[var(--src-muted)]">{block.alignmentCopy}</p>
+      <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
+      <p className="text-sm text-[var(--src-muted)]">{localize(locale, block.alignmentCopy)}</p>
       <a className="inline-block text-sm text-[var(--src-accent)]" href={`mailto:${block.email}`}>
         {block.email}
       </a>
@@ -303,15 +323,17 @@ function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
         <Card>
           <form className="space-y-4" onSubmit={submit}>
             {block.formFields.map((field: any, index: number) => {
+              const fieldLabel = localize(locale, field.label)
+              const fieldPlaceholder = localize(locale, field.placeholder)
               const key = `${field.label}-${index}`
 
               if (field.type === 'textarea') {
                 return (
                   <div className="space-y-2" key={key}>
-                    <label className="text-xs uppercase tracking-[0.12em] text-[var(--src-muted)]">{field.label}</label>
+                    <label className="text-xs uppercase tracking-[0.12em] text-[var(--src-muted)]">{fieldLabel}</label>
                     <Textarea
-                      name={field.label}
-                      placeholder={field.placeholder || ''}
+                      name={fieldLabel}
+                      placeholder={fieldPlaceholder}
                       required={Boolean(field.required)}
                     />
                   </div>
@@ -320,10 +342,10 @@ function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
 
               return (
                 <div className="space-y-2" key={key}>
-                  <label className="text-xs uppercase tracking-[0.12em] text-[var(--src-muted)]">{field.label}</label>
+                  <label className="text-xs uppercase tracking-[0.12em] text-[var(--src-muted)]">{fieldLabel}</label>
                   <Input
-                    name={field.label}
-                    placeholder={field.placeholder || ''}
+                    name={fieldLabel}
+                    placeholder={fieldPlaceholder}
                     required={Boolean(field.required)}
                     type={field.type === 'email' ? 'email' : 'text'}
                   />
@@ -334,7 +356,7 @@ function ContactForm({ block, locale }: { block: any; locale: SiteLocale }) {
             <Button disabled={submitState === 'submitting'} type="submit">
               {t(locale, {
                 en: submitState === 'submitting' ? 'Submitting...' : 'Submit Alignment Request',
-                zh: submitState === 'submitting' ? '\u63d0\u4ea4\u4e2d...' : '\u63d0\u4ea4\u534f\u540c\u7533\u8bf7',
+                zh: submitState === 'submitting' ? '\u63d0\u4ea4\u4e2d...' : '\u63d0\u4ea4\u534f\u4f5c\u7533\u8bf7',
               })}
             </Button>
 
@@ -381,12 +403,14 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                     zh: '\u79c1\u57df\u8d44\u672c\u7ed3\u6784\u529e\u516c\u5ba4',
                   })}
                 </p>
-                <h1 className="font-heading text-5xl leading-tight text-[var(--src-text)] lg:text-7xl">{block.brandName}</h1>
-                <p className="max-w-2xl text-sm leading-7 text-[var(--src-muted)]">{block.positioning}</p>
+                <h1 className="font-heading text-5xl leading-tight text-[var(--src-text)] lg:text-7xl">
+                  {localize(locale, block.brandName)}
+                </h1>
+                <p className="max-w-2xl text-sm leading-7 text-[var(--src-muted)]">{localize(locale, block.positioning)}</p>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild>
                     <Link href={block.primaryCTA?.url || '/philosophy'}>
-                      {block.primaryCTA?.label ||
+                      {localize(locale, block.primaryCTA?.label) ||
                         t(locale, {
                           en: 'Explore Philosophy',
                           zh: '\u63a2\u7d22\u7406\u5ff5',
@@ -395,7 +419,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
                   </Button>
                   <Button asChild variant="ghost">
                     <Link href={block.secondaryCTA?.url || '/contact'}>
-                      {block.secondaryCTA?.label ||
+                      {localize(locale, block.secondaryCTA?.label) ||
                         t(locale, {
                           en: 'Strategic Collaboration',
                           zh: '\u6218\u7565\u534f\u4f5c',
@@ -411,12 +435,12 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
         if (block.blockType === 'corePillars') {
           return (
             <section className="space-y-6" key={key}>
-              <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
+              <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
               <div className="grid gap-4 lg:grid-cols-3">
                 {asDocArray<{ title?: string; description?: string }>(block.cards).map((card, cardIndex) => (
                   <Card key={`${card.title}-${cardIndex}`}>
-                    <p className="font-heading text-xl text-[var(--src-text)]">{card.title}</p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{card.description}</p>
+                    <p className="font-heading text-xl text-[var(--src-text)]">{localize(locale, card.title)}</p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{localize(locale, card.description)}</p>
                   </Card>
                 ))}
               </div>
@@ -428,14 +452,14 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
           return (
             <section className="space-y-8" key={key}>
               <Card className="py-10">
-                <p className="font-heading text-2xl text-[var(--src-accent)] lg:text-4xl">{block.coreSentence}</p>
+                <p className="font-heading text-2xl text-[var(--src-accent)] lg:text-4xl">{localize(locale, block.coreSentence)}</p>
               </Card>
 
               <div className="grid gap-4 lg:grid-cols-3">
                 {asDocArray<{ title?: string; description?: string }>(block.modules).map((item, itemIndex) => (
                   <Card key={`${item.title}-${itemIndex}`}>
-                    <p className="font-heading text-lg text-[var(--src-text)]">{item.title}</p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{item.description}</p>
+                    <p className="font-heading text-lg text-[var(--src-text)]">{localize(locale, item.title)}</p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{localize(locale, item.description)}</p>
                   </Card>
                 ))}
               </div>
@@ -446,21 +470,21 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
         if (block.blockType === 'capitalDomains') {
           return (
             <section className="space-y-6" key={key}>
-              <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
+              <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
               <div className="grid gap-4 lg:grid-cols-3">
                 {asDocArray<any>(block.domains).map((domain, domainIndex) => (
                   <Card className="flex flex-col justify-between" key={`${domain.title}-${domainIndex}`}>
                     <div>
-                      <p className="font-heading text-xl text-[var(--src-text)]">{domain.title}</p>
+                      <p className="font-heading text-xl text-[var(--src-text)]">{localize(locale, domain.title)}</p>
                       <div className="mt-4 space-y-2 text-sm leading-7 text-[var(--src-muted)]">
-                        <p>{domain.line1}</p>
-                        <p>{domain.line2}</p>
-                        <p>{domain.line3}</p>
+                        <p>{localize(locale, domain.line1)}</p>
+                        <p>{localize(locale, domain.line2)}</p>
+                        <p>{localize(locale, domain.line3)}</p>
                       </div>
                     </div>
                     {domain.readMoreLabel && domain.readMoreUrl ? (
                       <Link className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-[var(--src-accent)]" href={domain.readMoreUrl}>
-                        {domain.readMoreLabel}
+                        {localize(locale, domain.readMoreLabel)}
                         <ArrowUpRight className="h-3.5 w-3.5" />
                       </Link>
                     ) : null}
@@ -478,18 +502,18 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
         if (block.blockType === 'riskArchitecture') {
           return (
             <section className="space-y-6" key={key}>
-              <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
+              <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
               <div className="grid gap-4 lg:grid-cols-2">
                 {asDocArray<any>(block.layers).map((layer, layerIndex) => (
                   <Card key={`${layer.layerName}-${layerIndex}`}>
                     <p className="text-xs uppercase tracking-[0.16em] text-[var(--src-accent)]">
                       {t(locale, { en: 'Layer', zh: '\u5c42\u7ea7' })} {layerIndex + 1}
                     </p>
-                    <p className="mt-2 font-heading text-xl text-[var(--src-text)]">{layer.layerName}</p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{layer.purpose}</p>
+                    <p className="mt-2 font-heading text-xl text-[var(--src-text)]">{localize(locale, layer.layerName)}</p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--src-muted)]">{localize(locale, layer.purpose)}</p>
                     <ul className="mt-4 space-y-2 text-sm text-[var(--src-muted)]">
                       {asDocArray<{ item?: string }>(layer.bullets).map((bullet, bulletIndex) => (
-                        <li key={`${bullet.item}-${bulletIndex}`}>? {bullet.item}</li>
+                        <li key={`${bullet.item}-${bulletIndex}`}>- {localize(locale, bullet.item)}</li>
                       ))}
                     </ul>
                   </Card>
@@ -505,22 +529,22 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
           return (
             <section className="space-y-6" key={key}>
               <div className="space-y-3">
-                <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
-                <p className="max-w-3xl text-sm leading-7 text-[var(--src-muted)]">{block.description}</p>
+                <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
+                <p className="max-w-3xl text-sm leading-7 text-[var(--src-muted)]">{localize(locale, block.description)}</p>
               </div>
               <div className="space-y-4">
                 {cases.map((entry, entryIndex) => (
                   <Card key={`${entry.strategicName}-${entryIndex}`}>
                     <div className="flex flex-wrap items-center gap-3">
                       <p className="text-xs uppercase tracking-[0.16em] text-[var(--src-accent)]">{entry.year}</p>
-                      <p className="font-heading text-xl text-[var(--src-text)]">{entry.strategicName}</p>
+                      <p className="font-heading text-xl text-[var(--src-text)]">{localize(locale, entry.strategicName)}</p>
                     </div>
                     <div className="mt-4 space-y-2 text-sm leading-7 text-[var(--src-muted)]">
                       {asDocArray<{ line?: string }>(entry.summaryLines).map((line, lineIndex) => (
-                        <p key={`${line.line}-${lineIndex}`}>{line.line}</p>
+                        <p key={`${line.line}-${lineIndex}`}>{localize(locale, line.line)}</p>
                       ))}
                     </div>
-                    <p className="mt-5 text-xs uppercase tracking-[0.14em] text-[var(--src-accent)]">{entry.resultSignature}</p>
+                    <p className="mt-5 text-xs uppercase tracking-[0.14em] text-[var(--src-accent)]">{localize(locale, entry.resultSignature)}</p>
                   </Card>
                 ))}
               </div>
@@ -535,7 +559,7 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
             <section className="grid gap-6 lg:grid-cols-[1.1fr_1.4fr]" key={key}>
               <Card className="overflow-hidden p-0">
                 {portrait?.url ? (
-                  <img alt={portrait.alt || block.heading} className="h-full min-h-[360px] w-full object-cover" src={portrait.url} />
+                  <img alt={localize(locale, portrait.alt || block.heading)} className="h-full min-h-[360px] w-full object-cover" src={portrait.url} />
                 ) : (
                   <div className="grid min-h-[360px] place-items-center text-sm text-[var(--src-muted)]">
                     {t(locale, { en: 'Founder Portrait', zh: '\u521b\u59cb\u4eba\u8096\u50cf' })}
@@ -544,12 +568,12 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
               </Card>
 
               <Card>
-                <h2 className="font-heading text-3xl text-[var(--src-text)]">{block.heading}</h2>
-                <p className="mt-4 text-sm leading-7 text-[var(--src-muted)]">{block.narrative}</p>
+                <h2 className="font-heading text-3xl text-[var(--src-text)]">{localize(locale, block.heading)}</h2>
+                <p className="mt-4 text-sm leading-7 text-[var(--src-muted)]">{localize(locale, block.narrative)}</p>
                 <div className="mt-6 space-y-3">
                   {asDocArray<{ point?: string }>(block.capabilityPoints).map((item, itemIndex) => (
                     <p className="text-sm text-[var(--src-muted)]" key={`${item.point}-${itemIndex}`}>
-                      ? {item.point}
+                      - {localize(locale, item.point)}
                     </p>
                   ))}
                 </div>
@@ -567,4 +591,3 @@ export function PageDocumentRenderer({ page, locale }: PageRendererProps) {
     </article>
   )
 }
-

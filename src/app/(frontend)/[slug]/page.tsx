@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { PageDocumentRenderer } from '@/components/page/PageDocumentRenderer'
 import { PageLivePreview } from '@/components/page/PageLivePreview'
 import { getRequestLocale } from '@/lib/i18n-server'
+import { localizeOptionalField } from '@/lib/i18n'
 import { queryPageBySlug, querySiteSettings } from '@/lib/queries'
 
 export const dynamic = 'force-dynamic'
@@ -71,6 +72,7 @@ export default async function PageRoute({ params }: PageProps) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const locale = await getRequestLocale()
   const { slug: maybeSlug } = await params
   const slug = normalizeSlug(maybeSlug)
 
@@ -81,21 +83,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!page) {
     return {
-      title: siteSettings?.defaultSEO?.title || 'Star Ring Capital',
-      description:
-        siteSettings?.defaultSEO?.description ||
-        'Private capital structure office focused on risk architecture and stable growth.',
+      title:
+        localizeOptionalField({ locale, value: siteSettings?.defaultSEO?.title }) || 'Star Ring Capital',
+      description: localizeOptionalField({
+        locale,
+        value:
+          siteSettings?.defaultSEO?.description ||
+          'Private capital structure office focused on risk architecture and stable growth.',
+      }),
     }
   }
 
   const image = page?.seo?.ogImage && typeof page.seo.ogImage === 'object' ? page.seo.ogImage : null
+  const title =
+    localizeOptionalField({ locale, value: page.seo?.title }) ||
+    localizeOptionalField({ locale, value: page.title })
+  const description = localizeOptionalField({ locale, value: page.seo?.description })
 
   return {
-    title: page.seo?.title || page.title,
-    description: page.seo?.description,
+    title,
+    description,
     openGraph: {
-      title: page.seo?.title || page.title,
-      description: page.seo?.description,
+      title,
+      description,
       images: image?.url ? [image.url] : undefined,
     },
   }

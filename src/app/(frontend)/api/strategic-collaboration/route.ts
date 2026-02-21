@@ -62,11 +62,24 @@ export async function POST(request: Request) {
   const sourcePage = truncate(body.sourcePage || '/', 200)
 
   const contactName =
-    findEntryValue(entries, ['name', 'full name', '姓名', '称呼', '联系人']) || 'Anonymous Submission'
-  const contactEmail = findEntryValue(entries, ['email', 'mail', '邮箱', '电子邮箱'])
-  const organization = findEntryValue(entries, ['organization', 'company', '机构', '公司'])
-  const phone = findEntryValue(entries, ['phone', 'mobile', 'whatsapp', '电话', '手机'])
-  const message = findEntryValue(entries, ['message', 'details', 'summary', '需求', '说明', '留言'])
+    findEntryValue(entries, [
+      'name',
+      'full name',
+      '\u59d3\u540d',
+      '\u79f0\u547c',
+      '\u8054\u7cfb\u4eba',
+    ]) || (locale === 'zh' ? '\u533f\u540d\u63d0\u4ea4' : 'Anonymous Submission')
+  const contactEmail = findEntryValue(entries, ['email', 'mail', '\u90ae\u7bb1', '\u7535\u5b50\u90ae\u7bb1'])
+  const organization = findEntryValue(entries, ['organization', 'company', '\u673a\u6784', '\u516c\u53f8'])
+  const phone = findEntryValue(entries, ['phone', 'mobile', 'whatsapp', '\u7535\u8bdd', '\u624b\u673a'])
+  const message = findEntryValue(entries, [
+    'message',
+    'details',
+    'summary',
+    '\u9700\u6c42',
+    '\u8bf4\u660e',
+    '\u7559\u8a00',
+  ])
 
   const payload = await getPayload({ config: configPromise })
 
@@ -90,4 +103,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true })
 }
-

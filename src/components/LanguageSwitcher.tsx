@@ -13,7 +13,7 @@ type LanguageSwitcherProps = {
 
 const languageOptions: Array<{ value: SiteLocale; label: string }> = [
   { value: 'en', label: 'EN' },
-  { value: 'zh', label: '中文' },
+  { value: 'zh', label: '\u4e2d\u6587' },
 ]
 
 export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
@@ -100,7 +100,7 @@ export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
                 type="button"
               >
                 <span className="whitespace-nowrap leading-none">{option.label}</span>
-                {active ? <span className="text-[var(--src-accent)]">✓</span> : null}
+                {active ? <span className="text-[var(--src-accent)]">\u2713</span> : null}
               </button>
             )
           })}

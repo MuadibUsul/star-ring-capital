@@ -69,7 +69,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     value: siteSettings?.siteName,
     fallback: {
       en: 'Star Ring Capital',
-      zh: '星环资本',
+      zh: '\u661f\u73af\u8d44\u672c',
     },
   })
   const localizedTagline = localizeField({
@@ -77,7 +77,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     value: siteSettings?.tagline,
     fallback: {
       en: 'Private Capital Structure Office',
-      zh: '私域资本结构办公室',
+      zh: '\u79c1\u57df\u8d44\u672c\u7ed3\u6784\u529e\u516c\u5ba4',
     },
   })
   const localizedCTA = localizeField({
@@ -85,7 +85,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     value: siteSettings?.primaryNavCTA?.label,
     fallback: {
       en: 'Strategic Collaboration',
-      zh: '战略协作',
+      zh: '\u6218\u7565\u534f\u4f5c',
     },
   })
   const localizedFooterNote = localizeField({
@@ -93,7 +93,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     value: siteSettings?.footerNote,
     fallback: {
       en: 'Structured influence. Stable growth. Disciplined risk architecture.',
-      zh: '结构化影响力，稳健增长，纪律化风险架构。',
+      zh: '\u7ed3\u6784\u5316\u5f71\u54cd\u529b\uff0c\u7a33\u5065\u589e\u957f\uff0c\u7eaa\u5f8b\u5316\u98ce\u9669\u67b6\u6784\u3002',
     },
   })
 

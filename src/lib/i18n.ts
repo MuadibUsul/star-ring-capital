@@ -2,21 +2,21 @@ export type SiteLocale = 'en' | 'zh'
 
 export const LOCALE_COOKIE_NAME = 'src-locale'
 
-type LocalizedText = {
+export type LocalizedText = {
   en: string
   zh: string
 }
 
 const navLabelZhBySlug: Record<string, string> = {
-  home: '首页',
-  philosophy: '理念',
-  'capital-domains': '资本领域',
-  'capital-trajectory': '资本轨迹',
-  'risk-architecture': '风险架构',
-  'strategic-engagement': '战略协作',
-  founder: '创始人',
-  contact: '联系',
-  research: '研究',
+  home: '\u9996\u9875',
+  philosophy: '\u7406\u5ff5',
+  'capital-domains': '\u8d44\u672c\u9886\u57df',
+  'capital-trajectory': '\u8d44\u672c\u8f68\u8ff9',
+  'risk-architecture': '\u98ce\u9669\u67b6\u6784',
+  'strategic-engagement': '\u6218\u7565\u534f\u4f5c',
+  founder: '\u521b\u59cb\u4eba',
+  contact: '\u8054\u7cfb',
+  research: '\u7814\u7a76',
 }
 
 const splitBilingual = (value?: string | null) => {
@@ -42,6 +42,23 @@ export const normalizeLocale = (value?: string | null): SiteLocale => {
 
 export const t = (locale: SiteLocale, value: LocalizedText) => {
   return locale === 'zh' ? value.zh : value.en
+}
+
+export const localizeOptionalField = ({
+  locale,
+  value,
+}: {
+  locale: SiteLocale
+  value?: string | null
+}) => {
+  const raw = value?.trim()
+  const bilingual = splitBilingual(raw)
+
+  if (bilingual) {
+    return locale === 'zh' ? bilingual.zh : bilingual.en
+  }
+
+  return raw || ''
 }
 
 export const localizeField = ({
@@ -80,16 +97,20 @@ export const localizeNavLabel = ({
   slug?: string | null
   label?: string | null
 }) => {
-  const bilingual = splitBilingual(label?.trim())
+  const rawLabel = label?.trim()
+  const bilingual = splitBilingual(rawLabel)
+
   if (bilingual) {
     return locale === 'zh' ? bilingual.zh : bilingual.en
   }
 
-  const fallback = label || slug || ''
-
-  if (locale === 'zh' && slug) {
-    return navLabelZhBySlug[slug] || fallback
+  if (rawLabel) {
+    return rawLabel
   }
 
-  return fallback
+  if (locale === 'zh' && slug) {
+    return navLabelZhBySlug[slug] || slug
+  }
+
+  return slug || ''
 }

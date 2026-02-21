@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Button } from '@/components/ui/button'
-import { localizeNavLabel, type SiteLocale } from '@/lib/i18n'
+import { localizeNavLabel, t, type SiteLocale } from '@/lib/i18n'
 
 type NavItem = {
   id: string | number
@@ -39,7 +39,8 @@ export async function SiteHeader({
   ctaUrl,
 }: SiteHeaderProps) {
   const primaryNavItems = navItems.slice(0, 5)
-  const rawCTALabel = ctaLabel || 'Strategic Collaboration'
+  const rawCTALabel =
+    ctaLabel || t(locale, { en: 'Strategic Collaboration', zh: '\u6218\u7565\u534f\u4f5c' })
   const resolvedCTALabel =
     locale === 'en' && rawCTALabel.length > 18 ? 'Strategic Intake' : rawCTALabel
 
